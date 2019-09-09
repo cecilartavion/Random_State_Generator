@@ -10,6 +10,18 @@ To run the code, change working directory to the file that contains "test_main.p
 ```
 run test_main.py grid_placement sampling_method merge_method sample_num state pop_category num_cities city_nums mod mod_prob demo_cols sampling_parameters
 ```
+Here is a description of each variable in the above script:
+- `grid_placement`: A tuple of length 2, 3, or 4. 
+The grid corresponds to how each sample of `sample_num` census blocks is placed in the countryside.
+The first element of each tuple describes the method used to build the countryside and possible the cities. 
+The method options are 'random', 'fixed', and 'mixed' and must be given as strings. 
+The remaining elements in each tuple are positive integers.  For the tuple lengths, the method corresponds to the length of the tuple. 
+That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixed', and 'mixed' respectively. 
+  - When the method is set to 'random', the first sample of census blocks is placed at grid location (0,0) (x,y coordinate locations). Then all of the subsequent samples are placed iteratively around what has been constructed so far for the grid. So for the second sample, the possible locations would be (0,1), (1,0), (-1,0), and (0,-1). 
+  - When `grid_placement` is set to ('fixed',m,n), a rectangular m by n grid is made using mn samples. The first sample is placed in location (0,0) and the rectangle is constructed with corners (0,0), (a-1,0), (b-1,0), and (a-1,b-1). 
+  - When `grid_placement` is set to ('mixed',m,n,p), a rectangular m by n grid is made using mn samples like when the method was 'fixed'. Then p additional samples of census blocks are added iteratively to the boundary of the rectangle using the 'random' method. In total, there will be mnp samples.
+-
+
 An example fo fully filled out command to run in the terminal would be the following:
 ```
 run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all 5 4 none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0)
