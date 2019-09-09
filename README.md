@@ -90,8 +90,57 @@ That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixe
   For example, a second sample of census blocks has 8 census blocks that occupy the "left side of the boundary rectangle" on intervals [0,0.1], [0.1,0.25], [0.25,0.28], [0.28,0.31], [0.31,0.5], [0.5,0.66], [0.66,0.81],[0.81,1.0]. 
   Now suppose that the previous to samples are going to be joined together. 
   Then there will be an edge between the census blocks with the following pairs of intervals: {[0,0.15],[0,0.1]}, {[0,0.15],[0.1,0.25]}, {[0.15,0.3],[0.1,0.25]}, {[0.15,0.3],[0.25,0.28]}, {[0.15,0.3],[0.28,0.31]}, {[0.3,0.41],[0.31,0.5]}, {[0.41,0.45],[0.31,0.5]}, {[0.45,0.8], [0.31,0.5]}, {[0.45,0.8],[0.5,0.66]}, {[0.45,0.8],[0.66,0.81]}, {[0.8,1.0],[0.66,0.81]}, {[0.8,1.0],[0.81,1.0]}.
-- `sample_num`: 
-- `state`: 
+- `sample_num`: two digit string that represents the approximate number of census blocks in each sample taken. 
+- `state`: two digit number that represents the U.S. from which data is sampled. 
+The possible two-digit value and their corresponding states are 
+01 -- Alabama, 
+04 -- Arizona, 
+05 -- Arkansas, 
+06 -- California, 
+08 -- Colorado, 
+09 -- Connecticut, 
+10 -- Delaware, 
+12 -- Florida, 
+13 -- Georgia, 
+16 -- Idaho, 
+17 -- Illinois, 
+18 -- Indiana, 
+19 -- Iowa, 
+20 -- Kansas, 
+21 -- Kentucky, 
+22 -- Louisiana,
+23 -- Maine,
+24 -- Maryland,
+25 -- Massachusetts,
+26 -- Michigan,
+27 -- Minnesota,
+28 -- Mississippi,
+29 -- Missouri,
+30 -- Montana,
+31 -- Nebraska,
+32 -- Nevada,
+33 -- New Hampshire,
+34 -- New Jersey,
+35 -- New Mexico,
+36 -- New York,
+37 -- North Carolina,
+38 -- North Dakota,
+39 -- Ohio,
+40 -- Oklahoma,
+41 -- Ohio,
+42 -- Pennsylvania,
+44 -- Rhode Island,
+45 -- South Carolina,
+46 -- South Dakota,
+47 -- Tennessee,
+48 -- Texas,
+49 -- Utah,
+50 -- Vermont,
+51 -- Virginia,
+53 -- Washington,
+54 -- West Virginia,
+55 -- Wisconsin,
+56 -- Wyoming.
 - `pop_category`: 
 - `num_cities`: 
 - `city_nums`: 
