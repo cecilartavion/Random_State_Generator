@@ -4,53 +4,53 @@ This repository holds both the code (the code that is allowed to be released due
 ## Goal
 The purpose of this code is to produce randomly generated states built from the census blocks of 48 of the 50 U.S. states (Alaska and Hawaii are removed due to contiguity complications). 
 The output of the code will be a dual graph where each vertex is a census block, edges represent adjacent census blocks and each census block contains the following columns of information:
-- `BLOCKID10`:
-- `geoid`:
-- `BLOCKCE`:
-- `block`:
-- `STATEFP10`:
-- `state`:
-- `COUNTYFP10`:
-- `county`:
-- `TRACTCE10`:
-- `tract`:
-- `PARTFLG`:
-- `HOUSING10`:
-- `C_X`:
-- `C_Y`:
-- `NAME`:
-- `NAME10`:
-- `NAMELSAD10`:
-- `UR10`:
-- `area`:
-- `boundary_perim`:
-- `boundary_node`:
-- `POP10`:
-- `TOTPOP`:
-- `NH_WHITE`:
-- `NH_BLACK`:
-- `NH_2MORE`:
-- `NH_AMIN`:
-- `NH_ASIAN`:
-- `NH_NHPI`:
-- `NH_OTHER`:
-- `HISP`:
-- `H_2MORE`:
-- `H_AMIN`:
-- `H_ASIAN`:
-- `H_BLACK`:
-- `H_NHPI`:
-- `H_OTHER`:
-- `H_WHITE`:
-- `VAP`:
-- `WVAP`:
-- `BVAP`:
-- `HVAP`:
-- `AMINVAP`:
-- `ASIANVAP`:
-- `NHPIVAP`:
-- `2MOREVAP`:
-- `OTHERVAP`:
+- `BLOCKID10`: Block identifier; a concatenation of 2010 Census state FIPS code, county FIPS code, census tract code and tabulation block number.
+- `geoid`: VTD FIPS code
+- `BLOCKCE`: 2010 Census tabulation block number
+- `block`: 2010 Census tabulation block number
+- `STATEFP10`: 2010 Census state FIPS code
+- `state`: 2010 Census state FIPS code
+- `COUNTYFP10`: 2010 Census county FIPS code
+- `county`: 2010 Census county FIPS code
+- `TRACTCE10`: 2010 Census  tract code
+- `tract`: 2010 Census  tract code
+- `PARTFLG`: Part Flag Indicator – Y = partial block, N = whole block; Part Flag should always be N in these files
+- `HOUSING10`: 2010 Census Housing Unit Count
+- `C_X`: Longitude of the centroid of the census block
+- `C_Y`: Latitude of the centroid of the census block
+- `NAME`: Current Alaska Native Regional Corporation name
+- `NAME10`: 2010 Census urban area name
+- `NAMELSAD10`: Current name and the translated legal/statistical area description for Alaska Native Regional Corporation
+- `UR10`: 2010 Census urban/rural indicator
+- `area`: Area of the geometry
+- `boundary_perim`: Length of this “exterior” boundary of the census block for the boundary of the state
+- `boundary_node`: binary attribute to indicate if a census block is on the exterior of a state
+- `POP10`: 2010 Census Population Count
+- `TOTPOP`: 2010 Census Population Count
+- `NH_WHITE`: White, non-hispanic, population in 2010 Census
+- `NH_BLACK`: Black, non-hispanic, population in 2010 Census
+- `NH_AMIN`: American Indian and Alaska Native, non-hispanic, population in 2010 Census
+- `NH_ASIAN`: Asian, non-hispanic, population in 2010 Census
+- `NH_NHPI`: Native Hawaiian and Pacific Islander, non-hispanic, population in 2010 Census
+- `NH_OTHER`: Other race, non-hispanic, population in 2010 Census
+- `NH_2MORE`: Two or more races, non-hispanic, population in 2010 Census
+- `HISP`: Hispanic population in 2010 Census
+- `H_WHITE`: White, hispanic, population in 2010 Census
+- `H_BLACK`: Black, hispanic, population in 2010 Census
+- `H_AMIN`: American Indian and Alaska Native, hispanic, population in 2010 Census
+- `H_ASIAN`: Asian, hispanic, population in 2010 Census
+- `H_NHPI`: Native Hawaiian and Pacific Islander, hispanic, population in 2010 Census
+- `H_OTHER`: Other race, hispanic, population in 2010 Census
+- `H_2MORE`: Two or more races, hispanic, population in 2010 Census
+- `VAP`: Total voting age population in 2010 Census
+- `HVAP`: Hispanic voting age population in 2010 Census
+- `WVAP`: White, non-hispanic, voting age population in 2010 Census
+- `BVAP`: Black, non-hispanic, voting age population in 2010 Census
+- `AMINVAP`: American Indian and Alaska Native, non-hispanic, voting age population in 2010 Census
+- `ASIANVAP`: Asian, non-hispanic, voting age population in 2010 Census
+- `NHPIVAP`: Native Hawaiian and Pacific Islander, non-hispanic, voting age population in 2010 Census
+- `OTHERVAP`: Other race, non-hispanic, voting age population in 2010 Census
+- `2MOREVAP`: Two or more races, non-hispanic, voting age population in 2010 Census
 
 ## How To Run Code
 
@@ -208,7 +208,9 @@ The options for elements in the list are the following:
 'NHPIVAP',
 '2MOREVAP', and
 'OTHERVAP'.
-- `sampling_parameters`: 
+- `sampling_parameters`: A binary tuple of length 3. The three elements indicate for which data will noise be added.
+If the first coordinate is 1, the total population will have random Gaussian noise added. If the second coordinate is 1, the variables in `demo_cols` will have random noise added. If the third coordinate is 1, the vote totals will have random noise added.
+WARNING: Currently, there is no vote total column, so anything but 0 will likely produce an error, or it should produce an error if it does not. 
 
 An example fo fully filled out command to run in the terminal would be the following:
 ```
