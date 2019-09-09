@@ -20,7 +20,13 @@ That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixe
   - When the method is set to 'random', the first sample of census blocks is placed at grid location (0,0) (x,y coordinate locations). Then all of the subsequent samples are placed iteratively around what has been constructed so far for the grid. So for the second sample, the possible locations would be (0,1), (1,0), (-1,0), and (0,-1). 
   - When `grid_placement` is set to ('fixed',m,n), a rectangular m by n grid is made using mn samples. The first sample is placed in location (0,0) and the rectangle is constructed with corners (0,0), (a-1,0), (b-1,0), and (a-1,b-1). 
   - When `grid_placement` is set to ('mixed',m,n,p), a rectangular m by n grid is made using mn samples like when the method was 'fixed'. Then p additional samples of census blocks are added iteratively to the boundary of the rectangle using the 'random' method. In total, there will be mnp samples.
-- `sampling_method`: 
+- `sampling_method`: A string which represents how each sample is built. The options for this string are 'rect' and 'diam'. 
+  - For 'rect', a random census block is chosen (urban or rural depends which part of the code this variable is executed). 
+  Then a window is drawn around one census block. 
+  Then at each iteration, one side of the rectangular window is expanded by 0.1 degrees (between 6.8 and 7 miles in terms of distance in latitudinal and longitudinal directions). 
+  The window will stop growing once it reaches at least `sample_num` census blocks in the window. 
+  - For 'diam', a random census block, call it v, is chosen (urban or rural depends which part of the code this variable is executed).
+  Then the vertices distance 1 (graph theoretic distance) from v are added to the sample. 
 - `merge_method`: 
 - `sample_num`: 
 - `state`: 
