@@ -27,6 +27,8 @@ That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixe
   The window will stop growing once it reaches at least `sample_num` census blocks in the window. 
   - For 'diam', a random census block, call it v, is chosen (urban or rural depends which part of the code this variable is executed).
   Then the vertices distance 1 (graph theoretic distance) from v are added to the sample. 
+  If the number of vertices in this subgraph is less than `sample_num`, then add all of the vertices distance 2 from v to the sample. 
+  Once there are at least `sample_num` vertices in the sample, vertices are deleted uniformly at random from the list of vertices furtherest away from v in our sample until only `sample_num` vertices remain. 
 - `merge_method`: 
 - `sample_num`: 
 - `state`: 
