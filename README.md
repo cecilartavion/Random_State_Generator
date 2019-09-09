@@ -3,6 +3,54 @@ This repository holds both the code (the code that is allowed to be released due
 
 ## Goal
 The purpose of this code is to produce randomly generated states built from the census blocks of 48 of the 50 U.S. states (Alaska and Hawaii are removed due to contiguity complications). 
+The output of the code will be a dual graph where each vertex is a census block, edges represent adjacent census blocks and each census block contains the following columns of information:
+- `BLOCKID10`:
+- `geoid`:
+- `BLOCKCE`:
+- `block`:
+- `STATEFP10`:
+- `state`:
+- `COUNTYFP10`:
+- `county`:
+- `TRACTCE10`:
+- `tract`:
+- `PARTFLG`:
+- `HOUSING10`:
+- `C_X`:
+- `C_Y`:
+- `NAME`:
+- `NAME10`:
+- `NAMELSAD10`:
+- `UR10`:
+- `area`:
+- `boundary_perim`:
+- `boundary_node`:
+- `POP10`:
+- `TOTPOP`:
+- `NH_WHITE`:
+- `NH_BLACK`:
+- `NH_2MORE`:
+- `NH_AMIN`:
+- `NH_ASIAN`:
+- `NH_NHPI`:
+- `NH_OTHER`:
+- `HISP`:
+- `H_2MORE`:
+- `H_AMIN`:
+- `H_ASIAN`:
+- `H_BLACK`:
+- `H_NHPI`:
+- `H_OTHER`:
+- `H_WHITE`:
+- `VAP`:
+- `WVAP`:
+- `BVAP`:
+- `HVAP`:
+- `AMINVAP`:
+- `ASIANVAP`:
+- `NHPIVAP`:
+- `2MOREVAP`:
+- `OTHERVAP`:
 
 ## How To Run Code
 
@@ -29,7 +77,16 @@ That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixe
   Then the vertices distance 1 (graph theoretic distance) from v are added to the sample. 
   If the number of vertices in this subgraph is less than `sample_num`, then add all of the vertices distance 2 from v to the sample. 
   Once there are at least `sample_num` vertices in the sample, vertices are deleted uniformly at random from the list of vertices furtherest away from v in our sample until only `sample_num` vertices remain. 
-- `merge_method`: 
+- `merge_method`: A string which represents how a sample is added to a grid of already merged samples. The options for this string are 'intervals' and 'intersect'. 
+  - For 'intervals', the maximum and minimum values in the x- and y-directions are found. 
+  The geometric boundary recorded in the shapefile contains a list of points that dictact the boundary of each census block. 
+  Using these points, the the boundary that creates a sample is used to construct a list of the points on the boundary of the sample. 
+  These points are ordered and the positive of the maximum and minimum values in the x- and y-directions are recorded. 
+  Then the median point between each pair of successive maximum and minimum values in the list of ordered boundary points are found and recorded as the "four corners of a rectangle". 
+  In this way, a pseudo-rectangular boundary region is constructed for the sample.
+  After the "four corners of a rectangle" representing the boundary of the sample are recorded, the proportion and order of the census blocks that occupy each side of the rectangle are recorded using interval notation.
+  For example, say 6 census blocks occupy the "right side of the boundary rectangle" on the intervals [0,0.15], [0.15,0.3], [0.3,0.41], [0.41,0.45], [0.45,0.8], [0.8,1.0].
+  When a sample is joined to another sample, the intervals are matched so that edges are added between census blocks that share 
 - `sample_num`: 
 - `state`: 
 - `pop_category`: 
