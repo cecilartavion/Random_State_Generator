@@ -85,8 +85,11 @@ That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixe
   Then the median point between each pair of successive maximum and minimum values in the list of ordered boundary points are found and recorded as the "four corners of a rectangle". 
   In this way, a pseudo-rectangular boundary region is constructed for the sample.
   After the "four corners of a rectangle" representing the boundary of the sample are recorded, the proportion and order of the census blocks that occupy each side of the rectangle are recorded using interval notation.
-  For example, say 6 census blocks occupy the "right side of the boundary rectangle" on the intervals [0,0.15], [0.15,0.3], [0.3,0.41], [0.41,0.45], [0.45,0.8], [0.8,1.0].
-  When a sample is joined to another sample, the intervals are matched so that edges are added between census blocks that share 
+  For example, say a sample of census blocks has 6 census blocks that occupy the "right side of the boundary rectangle" on the intervals [0,0.15], [0.15,0.3], [0.3,0.41], [0.41,0.45], [0.45,0.8], [0.8,1.0].
+  When a sample is joined to another sample, the intervals are matched so that edges are added between census blocks that have overlapping invervals. 
+  For example, a second sample of census blocks has 8 census blocks that occupy the "left side of the boundary rectangle" on intervals [0,0.1], [0.1,0.25], [0.25,0.28], [0.28,0.31], [0.31,0.5], [0.5,0.66], [0.66,0.81],[0.81,1.0]. 
+  Now suppose that the previous to samples are going to be joined together. 
+  Then there will be an edge between the census blocks with the following pairs of intervals: {[0,0.15],[0,0.1]}, {[0,0.15],[0.1,0.25]}, {[0.15,0.3],[0.1,0.25]}
 - `sample_num`: 
 - `state`: 
 - `pop_category`: 
