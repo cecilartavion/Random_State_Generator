@@ -141,7 +141,32 @@ The possible two-digit value and their corresponding states are
 54 -- West Virginia,
 55 -- Wisconsin,
 56 -- Wyoming.
-- `pop_category`: 
+Both Alaska and Hawaii are not included because of contiguity complications.
+- `pop_category`: integer or string. The only string accepted is 'all'. The intergers allowed are from 0 to the length of the population division. The population is currently divided into cities with 
+less than 50,000 people (0), 
+between 50,000 and 60,000 people (1),
+between 60,000 and 70,000 people (2),
+between 70,000 and 80,000 people (3), 
+between 80,000 and 90,000 people (4), 
+between 90,000 and 100,000 people (5),
+between 100,000 and 200,000 people (6),
+between 200,000 and 300,000 people (7),
+between 300,000 and 400,000 people (8),
+between 400,000 and 500,000 people (9),
+between 500,000 and 600,000 people (10),
+between 600,000 and 700,000 people (11),
+between 700,000 and 800,000 people (12),
+between 800,000 and 900,000 people (13),
+between 900,000, and 1,000,000 people (14),
+between 1 and 2 million people (15),
+between 2 and 3 million people (16), 
+between 3 and 4 million people (17), 
+between 4 and 5 million people (18), 
+between 5 and 6 million people (19), 
+between 6 and 7 million people (20), 
+between 7 and 8 million people (21), 
+and over 8 million people  (22). 
+The population between 50K and 60K are labeled as 0 in `pop_category` and increases incrementally as the population increases. 
 - `num_cities`: 
 - `city_nums`: 
 - `mod`: 
