@@ -20,7 +20,17 @@ That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixe
   - When the method is set to 'random', the first sample of census blocks is placed at grid location (0,0) (x,y coordinate locations). Then all of the subsequent samples are placed iteratively around what has been constructed so far for the grid. So for the second sample, the possible locations would be (0,1), (1,0), (-1,0), and (0,-1). 
   - When `grid_placement` is set to ('fixed',m,n), a rectangular m by n grid is made using mn samples. The first sample is placed in location (0,0) and the rectangle is constructed with corners (0,0), (a-1,0), (b-1,0), and (a-1,b-1). 
   - When `grid_placement` is set to ('mixed',m,n,p), a rectangular m by n grid is made using mn samples like when the method was 'fixed'. Then p additional samples of census blocks are added iteratively to the boundary of the rectangle using the 'random' method. In total, there will be mnp samples.
--
+- `sampling_method`: 
+- `merge_method`: 
+- `sample_num`: 
+- `state`: 
+- `pop_category`: 
+- `num_cities`: 
+- `city_nums`: 
+- `mod`: 
+- `mod_prob`: 
+- `demo_cols`: 
+- `sampling_parameters`: 
 
 An example fo fully filled out command to run in the terminal would be the following:
 ```
