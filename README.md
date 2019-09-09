@@ -24,4 +24,7 @@ The '3' and '4' represent the length and width of the rectangle built using the 
 - `pop_category` is set to 'all'. This means that all possible population sizes are allowed when choosing census blocks to build the cities.
 - `num_cities` is set to 5.
 - `city_nums` is set to 4. That is, the code will build 4 cities.
-- 
+- `mod` is set to none. That is, no modification will be made to the edges/vertices in each sample.
+- `mod_prob` is set to 0.5. That is, there is a probability of 0.5 that a modification will take place for the edges/vertices according to the `mod` chosen. 
+- `demo_cols` is set to ('BVAP','HVAP','WVAP','VAP'). That is, the only demographic columns that will be randomly modified (if at all) are Black, non-hispanic, voting age population in 2010 Census (BVAP), Hispanic voting age population in 2010 Census (HVA) White, non-hispanic, voting age population in 2010 Census (WVAP), and voting age population in 2010 Census (VAP). 
+- `sampling_parameters` is set to (1,1,0). That is, the total population and the demographics will have noise added to the data in each census block randomly. 
