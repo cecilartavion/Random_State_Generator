@@ -167,9 +167,18 @@ between 6 and 7 million people (20),
 between 7 and 8 million people (21), 
 and over 8 million people  (22). 
 The population between 50K and 60K are labeled as 0 in `pop_category` and increases incrementally as the population increases. 
-- `num_cities`: 
-- `city_nums`: 
-- `mod`: 
+- `city_nums`: integer representing the number of cities that will be stitched into the countryside uniformly at random.
+- `mod`: string that represents the modification that is to be made on each sample.
+This modification would be to the edges between census blocks in the sample or the vertices (census blocks) themselves. 
+The options for modification are as follows: 'add_vert', 'add_edges', 'add_remove_edges', 'delete_vert', and 'delete_edges'.
+WARNING: It is possible that all of these modification may make the graph non-planar. 
+WARNING: add_vert is suppressed at the moment since no method was implemented to build the data from a new vertex that is added to the graph. 
+The purpose of modifying the graph is to create random samples that are similar to the original sample graphically, but not exactly the same. 
+  - 'add_vert': Adds a vertex to a random face uniformly at random and adds a random number of edges based on `mod_prob` probability. The sample must be planar for this to work. Currently, this method is suppressed since it is not clear how to generate data out of nowhere for the new census block.
+  - 'add_edges': Add a random number of edges between vertices based on the `mod_prob` probability while retaining planarity. The sample must be planar in order for any edges to be added. 
+  - 'add_remove_edges': Add and remove a random number of edges based on the `mod_prob` probability while retaining planarity. The sample must be planar in order for any edges to be added. 
+  - 'delete_vert': A random probability of vertices are deleted based on the `mod_prob` probability. It is possible the sample becomes disconnected.
+  - 'delete_edges': A random probability of edges are deleted based on the `mod_prob` probability. It is possible the sample becomes disconnected.
 - `mod_prob`: 
 - `demo_cols`: 
 - `sampling_parameters`: 
@@ -186,7 +195,6 @@ The '3' and '4' represent the length and width of the rectangle built using the 
 - `sample_num` is set to 50. That is, the number of census blocks chosen in each sample is approximately 50.
 - `state` is set to '44' which is Rhode Island.
 - `pop_category` is set to 'all'. This means that all possible population sizes are allowed when choosing census blocks to build the cities.
-- `num_cities` is set to 5.
 - `city_nums` is set to 4. That is, the code will build 4 cities.
 - `mod` is set to none. That is, no modification will be made to the edges/vertices in each sample.
 - `mod_prob` is set to 0.5. That is, there is a probability of 0.5 that a modification will take place for the edges/vertices according to the `mod` chosen. 
