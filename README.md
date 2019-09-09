@@ -167,10 +167,11 @@ between 6 and 7 million people (20),
 between 7 and 8 million people (21), 
 and over 8 million people  (22). 
 The population between 50K and 60K are labeled as 0 in `pop_category` and increases incrementally as the population increases. 
+Another option is to set the variable to 'all' which indicates that all city sizes are possible in the creation of new cities. 
 - `city_nums`: integer representing the number of cities that will be stitched into the countryside uniformly at random.
 - `mod`: string that represents the modification that is to be made on each sample.
 This modification would be to the edges between census blocks in the sample or the vertices (census blocks) themselves. 
-The options for modification are as follows: 'add_vert', 'add_edges', 'add_remove_edges', 'delete_vert', and 'delete_edges'.
+The options for modification are as follows: 'add_vert', 'add_edges', 'add_remove_edges', 'delete_vert', 'delete_edges', and 'none'.
 WARNING: It is possible that all of these modification may make the graph non-planar. 
 WARNING: add_vert is suppressed at the moment since no method was implemented to build the data from a new vertex that is added to the graph. 
 The purpose of modifying the graph is to create random samples that are similar to the original sample graphically, but not exactly the same. 
@@ -179,8 +180,34 @@ The purpose of modifying the graph is to create random samples that are similar 
   - 'add_remove_edges': Add and remove a random number of edges based on the `mod_prob` probability while retaining planarity. The sample must be planar in order for any edges to be added. 
   - 'delete_vert': A random probability of vertices are deleted based on the `mod_prob` probability. It is possible the sample becomes disconnected.
   - 'delete_edges': A random probability of edges are deleted based on the `mod_prob` probability. It is possible the sample becomes disconnected.
-- `mod_prob`: 
-- `demo_cols`: 
+  - 'none': No modification is made. 
+- `mod_prob`: A Float between 0 and 1 that represents the probability of a change occurring based on the modification selected in `mod`.
+- `demo_cols`: A list of strings where each string represents the demographic columns that will have Gaussian random noise applied to each census block in each of the samples. 
+The options for elements in the list are the following: 
+'NH_WHITE',
+'NH_BLACK',
+'NH_2MORE',
+'NH_AMIN',
+'NH_ASIAN',
+'NH_NHPI',
+'NH_OTHER',
+'HISP',
+'H_2MORE',
+'H_AMIN',
+'H_ASIAN',
+'H_BLACK',
+'H_NHPI',
+'H_OTHER',
+'H_WHITE',
+'VAP',
+'WVAP',
+'BVAP',
+'HVAP',
+'AMINVAP',
+'ASIANVAP',
+'NHPIVAP',
+'2MOREVAP', and
+'OTHERVAP'.
 - `sampling_parameters`: 
 
 An example fo fully filled out command to run in the terminal would be the following:
