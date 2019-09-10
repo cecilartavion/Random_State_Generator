@@ -211,7 +211,7 @@ The options for elements in the list are the following:
 - `sampling_parameters`: A binary tuple of length 3. The three elements indicate for which data will noise be added.
 If the first coordinate is 1, the total population will have random Gaussian noise added. If the second coordinate is 1, the variables in `demo_cols` will have random noise added. If the third coordinate is 1, the vote totals will have random noise added.
 WARNING: Currently, there is no vote total column, so anything but 0 will likely produce an error, or it should produce an error if it does not. 
-- `save_status`: A binary tuple of length 2. If the first coordinate is 1, a png will be save of the final graph after cities have been merged into the graph. 
+- `save_status`: A binary tuple of length 2. If the first coordinate is 1, a png will be save of the final graph after cities have been merged into the graph. In the png image, the red vertices represent the rural census blocks while the blue vertices represent the cities. 
 If the second coordinate is 1, a json file of the graph with the data will be saved into a folder called OUTPUT. 
 
 An example fo fully filled out command to run in the terminal would be the following:
