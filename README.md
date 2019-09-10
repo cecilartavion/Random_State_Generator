@@ -56,7 +56,7 @@ The output of the code will be a dual graph where each vertex is a census block,
 
 To run the code, change working directory to the file that contains "test_main.py". Then run the following command with the appropriate variables filled in (descriptions below):
 ```
-run test_main.py grid_placement sampling_method merge_method sample_num state pop_category num_cities city_nums mod mod_prob demo_cols sampling_parameters
+run test_main.py grid_placement sampling_method merge_method sample_num state pop_category num_cities city_nums mod mod_prob demo_cols sampling_parameters save_status
 ```
 Here is a description of each variable in the above script:
 - `grid_placement`: A tuple of length 2, 3, or 4. 
@@ -211,10 +211,12 @@ The options for elements in the list are the following:
 - `sampling_parameters`: A binary tuple of length 3. The three elements indicate for which data will noise be added.
 If the first coordinate is 1, the total population will have random Gaussian noise added. If the second coordinate is 1, the variables in `demo_cols` will have random noise added. If the third coordinate is 1, the vote totals will have random noise added.
 WARNING: Currently, there is no vote total column, so anything but 0 will likely produce an error, or it should produce an error if it does not. 
+- `save_status`: A binary tuple of length 2. If the first coordinate is 1, a png will be save of the final graph after cities have been merged into the graph. 
+If the second coordinate is 1, a json file of the graph with the data will be saved into a folder called OUTPUT. 
 
 An example fo fully filled out command to run in the terminal would be the following:
 ```
-run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all 5 4 none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0)
+run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all 5 4 none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0) (1,1)
 ```
 Here is a description of each variable in the above command:
 - `grid_placement` is set to 'mixed' which means that it is a mixture of the 'random' `grid_placement` method and 'fixed' `grid_placement` method when constructing the countryside (mostly rural census blocks). 
@@ -229,6 +231,7 @@ The '3' and '4' represent the length and width of the rectangle built using the 
 - `mod_prob` is set to 0.5. That is, there is a probability of 0.5 that a modification will take place for the edges/vertices according to the `mod` chosen. 
 - `demo_cols` is set to ('BVAP','HVAP','WVAP','VAP'). That is, the only demographic columns that will be randomly modified (if at all) are Black, non-hispanic, voting age population in 2010 Census (BVAP), Hispanic voting age population in 2010 Census (HVA) White, non-hispanic, voting age population in 2010 Census (WVAP), and voting age population in 2010 Census (VAP). 
 - `sampling_parameters` is set to (1,1,0). That is, the total population and the demographics will have noise added to the data in each census block randomly. 
+- `save_status` is set to (1,1). That is, an image of the final graph will be saved as well as the json file of the graph with its corresponding data. 
 
 # Images 
 The files in images are examples of instances run by text_main.py. The description of each is recorded based on the same variables and order as listed above. 
