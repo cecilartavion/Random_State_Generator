@@ -90,6 +90,19 @@ That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixe
   For example, a second sample of census blocks has 8 census blocks that occupy the "left side of the boundary rectangle" on intervals [0,0.1], [0.1,0.25], [0.25,0.28], [0.28,0.31], [0.31,0.5], [0.5,0.66], [0.66,0.81],[0.81,1.0]. 
   Now suppose that the previous to samples are going to be joined together. 
   Then there will be an edge between the census blocks with the following pairs of intervals: {[0,0.15],[0,0.1]}, {[0,0.15],[0.1,0.25]}, {[0.15,0.3],[0.1,0.25]}, {[0.15,0.3],[0.25,0.28]}, {[0.15,0.3],[0.28,0.31]}, {[0.3,0.41],[0.31,0.5]}, {[0.41,0.45],[0.31,0.5]}, {[0.45,0.8], [0.31,0.5]}, {[0.45,0.8],[0.5,0.66]}, {[0.45,0.8],[0.66,0.81]}, {[0.8,1.0],[0.66,0.81]}, {[0.8,1.0],[0.81,1.0]}.
+  - For 'intersect', a bounding rectangle has been placed around the sample of census block centroids. 
+  For each census block, say v, inside the bounding rectangle that is adjacent to a census block, say u, outside of the bounding rectangle, the intersection point of the edge and the bounding rectangle is recorded.
+  The order of the intersection points between each edge pair, {u,v}, and the bounding rectangle for each side of the bounding rectangle are recorded. 
+  Then we will have an order to the adjacencies between that will be made between two samples. 
+  For example, suppose that sample A has 6 census blocks (call them c_1, c_2, c_3, c_4, c_5, and c_6) inside the bounding rectangle that have 12 intersection points on the right side of the bounding rectangle of sample A which are ordered from top to bottom as follows: c_1, c_2, c_1, c_1, c_3, c_3, c_4, c_4, c_5, c_4, c_6, c_6. 
+  Also, suppose that sample B has 8 census blocks (call them d_1, d_2,...,d_8) inside the bounding rectangle that have 10 intersection points on the left side of the bounding rectangle of sample B which are ordered from top to bottom as follows:
+  d_1, d_2, d_2, d_3, d_4, d_5, d_6, d_7, d_7, d_8. 
+  Then a random number between 10 and 12, inclusive, is chosen (say 11) which will be the target number of edges to join between the right side of sample A and left side of sample B.
+  For sample A, one edge will be randomly chosen not to be include, say c_2 is not included in the intersection point list. 
+  Now, sample B will have one intersection point added to the list of possible intersection points, say an extra d_7 is added, and it will be placed close to one of the already existing intersection points, say our new ordering of 11 intersection points are d_1, d_2, d_2, d_3, d_4, d_5, d_6, d_7, d_7, d_7, d_8. 
+  Then join the vertices of the centroids of census blocks according to the order we found above. 
+  That is, add the following edges to the graph so that the resulting graph is connected: {c_1,c_1}, {c_1,d_2}, {c_1,d_2}, {c_3,d_3}, {c_3,d_4}, {c_4,d_5}, {c_5,d_6}, {c_4,d_7}, {c_4,d_7}, {c_6,d_7}, {c_6,d_8}. 
+  WARNING: It is possible that by doing this merging method, the resulting graph may not be planar. 
 - `sample_num`: two digit string that represents the approximate number of census blocks in each sample taken. 
 - `state`: two digit number that represents the U.S. from which data is sampled. 
 The possible two-digit value and their corresponding states are 
