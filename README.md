@@ -56,7 +56,7 @@ The output of the code will be a dual graph where each vertex is a census block,
 
 To run the code, change working directory to the file that contains "test_main.py". Then run the following command with the appropriate variables filled in (descriptions below):
 ```
-run test_main.py grid_placement sampling_method merge_method sample_num state pop_category num_cities city_nums mod mod_prob demo_cols sampling_parameters save_status interval_prob
+run test_main.py grid_placement sampling_method merge_method sample_num state pop_category num_cities city_nums mod mod_prob demo_cols sampling_parameters save_status interval_prob mono_rural_ur mono_city_ur
 ```
 Here is a description of each variable in the above script:
 - `grid_placement`: A tuple of length 2, 3, or 4. 
@@ -227,10 +227,14 @@ WARNING: Currently, there is no vote total column, so anything but 0 will likely
 - `save_status`: A binary tuple of length 2. If the first coordinate is 1, a png will be save of the final graph after cities have been merged into the graph. In the png image, the red vertices represent the rural census blocks while the blue vertices represent the cities. 
 If the second coordinate is 1, a json file of the graph with the data will be saved into a folder called OUTPUT. 
 - `interval_prob`: Probability associated when the merge_method is 'interval'. This probability is the mean used to determine the probability of whether an edge should be kept. That is, a Gaussian random number is chosen to the this probability, say p, by using the value `interval_prob` as the mean and 0.1 as the standard deviation. This is set to 0.8 by default. The probability p is taken and multiplied by the number of edges joining two samples and the floor of this product is the number of edges that will be used to join two samples. Uniformly at random, edges are chosen to be joined between the two samples. 
+ - `mono_rural_ur`: A binary variable that is either 0 or 1. This variable determines whether urban census blocks are allowed to be included when building the countryside. 
+ If `mono_rural_ur` equals 1, then only rural census blocks are allowed in the construction of the countryside. Otherwise, urban census blocks are allowed to be included. 
+ - `mono_city_ur`: A binary variable that is either 0 or 1. This variable determines whether rural census blocks are allowed to be included when building the countryside. 
+ If `mono_city_ur` equals 1, then only urban census blocks are allowed in the construction of the city samples. Otherwise, rural census blocks are allowed to be included. 
 
 An example fo fully filled out command to run in the terminal would be the following:
 ```
-run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all 5 4 none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0) (1,1) 0.8
+run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all 5 4 none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0) (1,1) 0.8 1 0
 ```
 Here is a description of each variable in the above command:
 - `grid_placement` is set to 'mixed' which means that it is a mixture of the 'random' `grid_placement` method and 'fixed' `grid_placement` method when constructing the countryside (mostly rural census blocks). 
@@ -247,6 +251,8 @@ The '3' and '4' represent the length and width of the rectangle built using the 
 - `sampling_parameters` is set to (1,1,0). That is, the total population and the demographics will have noise added to the data in each census block randomly. 
 - `save_status` is set to (1,1). That is, an image of the final graph will be saved as well as the json file of the graph with its corresponding data. 
 - `interval_prob` is set to 0.8. That is, a Gaussian random number is chosen with mean 0.8 and standard deviation 0.1 to determine the proportion of edges that are kept between two samples. 
+- `mono_rural_ur` is set to 1. That is, when building the countryside, samples that start with a rural census block must only be built using rural census blocks. 
+- `mono_city_ur` is set to 0. That is when building the citites, rural census blocks are allowed to contain rural census blocks. 
 
 # Images 
 The files in images are examples of instances run by text_main.py. The description of each is recorded based on the same variables and order as listed above. 
