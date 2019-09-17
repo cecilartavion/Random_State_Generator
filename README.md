@@ -56,7 +56,7 @@ The output of the code will be a dual graph where each vertex is a census block,
 
 To run the code, change working directory to the file that contains "test_main.py". Then run the following command with the appropriate variables filled in (descriptions below):
 ```
-run test_main.py grid_placement sampling_method merge_method sample_num state pop_category num_cities city_nums mod mod_prob demo_cols sampling_parameters save_status interval_prob mono_rural_ur mono_city_ur
+run test_main.py grid_placement sampling_method merge_method sample_num state pop_category city_specs mod mod_prob demo_cols sampling_parameters save_status interval_prob mono_rural_ur mono_city_ur mean_samples_per_state
 ```
 Here is a description of each variable in the above script:
 - `grid_placement`: A tuple of length 2, 3, or 4. 
@@ -181,7 +181,11 @@ between 7 and 8 million people (21),
 and over 8 million people  (22). 
 The population between 50K and 60K are labeled as 0 in `pop_category` and increases incrementally as the population increases. 
 Another option is to set the variable to 'all' which indicates that all city sizes are possible in the creation of new cities. 
-- `city_nums`: integer representing the number of cities that will be stitched into the countryside uniformly at random.
+- `city_specs`: tuple that will help determine the number of cities using various methods. 
+The possible values for the first coordinate are 0, 1, 2, and 3. The lengths of the tuple depends on the first coordinate. If the first coordinate is 0, 1, 2, or 3, then the length of the tuple is 2, 2, 3, 2 respectively. 
+If the first coordinate is 0, then the number of samples used to build a city is the value in the second coordinate of the `city_specs` tuple. 
+If the first coordinate is 1 and the tuple is (1,x,y), then x is a string that represents the 2-digit code for one of the possible states listed above in `state`, and y is an integer greater than or equal to 1000. The number of cities when the first coordinate is 1 is the number of cities in state x with a population over y people.
+If the first coordinate is 2 and the tuple is (1,x), then x is the a string that represents the 2-digit code for one of the possible states listed above in `states`. 
 - `mod`: string that represents the modification that is to be made on each sample.
 This modification would be to the edges between census blocks in the sample or the vertices (census blocks) themselves. 
 The options for modification are as follows: 'add_vert', 'add_edges', 'add_remove_edges', 'delete_vert', 'delete_edges', and 'none'.
@@ -234,7 +238,7 @@ If the second coordinate is 1, a json file of the graph with the data will be sa
 
 An example fo fully filled out command to run in the terminal would be the following:
 ```
-run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all 5 4 none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0) (1,1) 0.8 1 0
+run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all (0,5) none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0) (1,1) 0.8 1 0
 ```
 Here is a description of each variable in the above command:
 - `grid_placement` is set to 'mixed' which means that it is a mixture of the 'random' `grid_placement` method and 'fixed' `grid_placement` method when constructing the countryside (mostly rural census blocks). 
@@ -244,7 +248,7 @@ The '3' and '4' represent the length and width of the rectangle built using the 
 - `sample_num` is set to 50. That is, the number of census blocks chosen in each sample is approximately 50.
 - `state` is set to '44' which is Rhode Island.
 - `pop_category` is set to 'all'. This means that all possible population sizes are allowed when choosing census blocks to build the cities.
-- `city_nums` is set to 4. That is, the code will build 4 cities.
+- `city_specs` is set to (0,5). That is, the code will build 5 cities.
 - `mod` is set to none. That is, no modification will be made to the edges/vertices in each sample.
 - `mod_prob` is set to 0.5. That is, there is a probability of 0.5 that a modification will take place for the edges/vertices according to the `mod` chosen. 
 - `demo_cols` is set to ('BVAP','HVAP','WVAP','VAP'). That is, the only demographic columns that will be randomly modified (if at all) are Black, non-hispanic, voting age population in 2010 Census (BVAP), Hispanic voting age population in 2010 Census (HVA) White, non-hispanic, voting age population in 2010 Census (WVAP), and voting age population in 2010 Census (VAP). 
