@@ -56,7 +56,7 @@ The output of the code will be a dual graph where each vertex is a census block,
 
 To run the code, change working directory to the file that contains "test_main.py". Then run the following command with the appropriate variables filled in (descriptions below):
 ```
-run test_main.py grid_placement sampling_method merge_method sample_num state pop_category city_specs mod mod_prob demo_cols sampling_parameters save_status interval_prob mono_rural_ur mono_city_ur mean_samples_per_state
+run test_main.py grid_placement sampling_method merge_method sample_num state pop_category city_specs mod mod_prob demo_cols sampling_parameters save_status interval_prob mono_rural_ur mono_city_ur mean_samples_per_state city_placement
 ```
 Here is a description of each variable in the above script:
 - `grid_placement`: A tuple of length 2, 3, or 4. 
@@ -238,10 +238,27 @@ If the second coordinate is 1, a json file of the graph with the data will be sa
 - `mono_city_ur`: A binary variable that is either 0 or 1. This variable determines whether rural census blocks are allowed to be included when building the countryside. 
  If `mono_city_ur` equals 1, then only urban census blocks are allowed in the construction of the city samples. Otherwise, rural census blocks are allowed to be included. 
 - `mean_samples_per_state`: A positive integer that represents the average number of samples that will be used to build the countryside. A standard number for this would be around 1000. If `mean_samples_per_state` is too large, there will be one census block per sample, which is undesirable for many reasons. If `mean_samples_per_state` is too small, there will be so few samples used to build the map, it will hardly look like a state and there will be large sections of the map that will be copy pasted directly from the state. 
+- `city_placement`: A variable that is either a tuple of length 4 or a string. All of the different options for `city_placement` will affect the distribution of where to place the next city in the countryside. 
+That is, a probability distribution will be placed at each grid location and when it is time to place the city in the countryside, a grid location will be randomly selected based on this probability distribution. 
+  -If `city_placement` is a tuple, the first element must be 'neighbor_cluster' and the tuple has the form ('neighbor_cluster',u_score,r_score,u_penalty). 
+  Both u_score and r_score are non_negative numbers (not at the same time) value for the prevelance of being closer or farther away from an urban location.
+  Specifically, for each census block x, the neighbors of x are summed together based on the value of u_score and r_score. 
+  Then the total is penalized by a factor of u_penalty (positive number) if x is going to land on an urban census block. 
+  Finally, all scores are normalized so that their sum is 1. 
+  - If `city_placement` is a string equal to 'random', then the probability distribution is a uniform probability distribution.
+  - If `city_placement` is a string equal to 'grid_gaussian_kde', then the probability distribution is formed using gaussian_kde from the scipy package.
+  Kernel density estimation is a way to estimate the probability density function (PDF) of a random variable in a non-parametric way. 
+  gaussian_kde works for both uni-variate and multi-variate data. It includes automatic bandwidth determination.
+  For our implementation of the gaussian_kde, the kernel is formed by giving the function of all the grid locations that are urban (>50% census blocks that are urban means the grid location is urban).
+  In this way, the probability of landing on an urban census block is higher than that of landing on a rural census block. 
+  Additionally, the probability distribution starts at a uniform value equal to the mean of the probabilities for urban and rural census blocks, and then the probability distribution is added to this, so as to increase the probability of choosing a random grid location that is rural. 
+  - If `city_placement` is a string equal to 'grid_gaussian_kde', then a similar procedure as when `city_placement` was equal to 'grid_gaussian_kde' will take place to determine the probability distribution.
+  The main difference is that the kernel function is constructed using the actual locations of all the census blocks in all grid locations. 
+  This gives a more representative kernel distribution function, however, it will take longer to build the kernel. 
 
 An example of a fully filled out command to run in the terminal would be the following:
 ```
-run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all (0,5) none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0) (1,1) 0.8 1 0 1000
+run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all (0,5) none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0) (1,1) 0.8 1 0 1000 random
 ```
 Here is a description of each variable in the above command:
 - `grid_placement` is set to 'mixed' which means that it is a mixture of the 'random' `grid_placement` method and 'fixed' `grid_placement` method when constructing the countryside (mostly rural census blocks). 
@@ -261,6 +278,7 @@ The '3' and '4' represent the length and width of the rectangle built using the 
 - `mono_rural_ur` is set to 1. That is, when building the countryside, samples that start with a rural census block must only be built using rural census blocks. 
 - `mono_city_ur` is set to 0. That is, when building the citites, rural census blocks are allowed to contain rural census blocks. 
 - `mean_samples_per_state` is set to 1000. That is, the average number of samples that will be used to build the countryside is 1000. 
+- `city_placement` is set to 'random'. That is, each city will be randomly inserted into the countryside. 
 
 # Images 
 The files in images are examples of instances run by text_main.py. The description of each is recorded based on the same variables and order as listed above. 
