@@ -59,7 +59,7 @@ To run the code, change working directory to the file that contains "test_main.p
 run random_state_generator.py state state_specs state_parameters sampling_merging_method sampling_parameter use_specs use_parameters city_specs noisy_parameters demo_cols support_parameters save_status
 ```
 Here is a description of each variable in the above script:
-- `state`: either the string 'random' or a two digit string that represents the U.S. from which data is sampled. 
+- `state`: This argument is either the string 'random' or a two digit string that represents the U.S. from which data is sampled. 
 The possible two-digit values and their corresponding states are as follows:
 01 -- Alabama, 
 04 -- Arizona, 
@@ -110,7 +110,9 @@ The possible two-digit values and their corresponding states are as follows:
 55 -- Wisconsin,
 56 -- Wyoming.
 Both Alaska and Hawaii are not included because of contiguity complications.
-- `state_specs`: 
+- `state_specs`: This argument is a tuple of length 2 with binary elements. Exactly one of the elements in the tuple must be True. 
+	- The first element in the tuple represents the variable 'state_shape'. In particular, if 
+	- The second element in the tuple represents the variable 'build_state'. 
 - `state_parameters`: 
 - `sampling_merging_method`:
 - `sampling_parameter`:
