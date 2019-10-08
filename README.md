@@ -1,6 +1,18 @@
 # Random State Generator
 This repository holds both the code (the code that is allowed to be released due to limitations on completeness and publication rules) as well as the images produced by the code. 
 
+The idea behind the construction is as follows. First, grid locations are constructed one at a time which primarily contain rural census blocks in order to form the countryside of the new state using some type of sampling procedure (called `sampling_method` in program. 
+Each grid location contains some number of census blocks depending on the arguments set by the user. 
+Then each grid location is merged to the countryside by some type of merge procedure (called `merge_method` in program). 
+
+Once the entire countryside is constructed, the program will move on to constructing the urban landscape. 
+There are three primary method in which the urban landscape is constructed. 
+First, only cities will be constructed similar to how the countryside was constructed, and then each city will be stitched into the countryside one at a time. 
+Second, cities will be constructed as above. 
+However, once all of the cities have been placed, the program will add individual grid locations that primarily contain urban census blocks. 
+Third, only individual grid locations that primarily contain urban census blocks are added to the countryside. 
+The quantity of the cities and the individual grid locations is determined by the user. 
+
 ## Goal
 The purpose of this code is to produce randomly generated states built from the census blocks of 48 of the 50 U.S. states (Alaska and Hawaii are removed due to contiguity complications). 
 The output of the code will be a dual graph where each vertex is a census block, edges represent adjacent census blocks and each census block contains the following columns of information:
@@ -111,14 +123,24 @@ The possible two-digit values and their corresponding states are as follows:
 56 -- Wyoming.
 Both Alaska and Hawaii are not included because of contiguity complications.
 - `state_specs`: This argument is a tuple of length 2 with binary elements. Exactly one of the elements in the tuple must be True. 
-	- The first element in the tuple represents the variable 'state_shape'. 
+	- The 1st element in `state_specs` represents the variable 'state_shape'. 
 	In particular, if 'state_shape' is True, then the coordinates for the grid locations will form an approximate shape of a state based on the 'mean_samples_per_state' value. 
-	Note that when 'state_shape' is set to True, the third element in `state_parameters` will indicate the state for which the program will approximate the shape of a state. 
+	Note that when 'state_shape' is set to True, the 3rd element in `state_parameters` will indicate the state for which the program will approximate the shape of a state. 
 	That means the distributions of population can be applied to the particular shape of a different state, thus allowing for the ability to determine the effects of shape and distribution on the state. 
-	- The second element in the tuple represents the variable 'build_state'. 
-	In particular, if 'build_state' is True, then the state will be built randomly according to the directions provided by the third element in `state_parameters`. 
-	Again, note that the third element in `state_parameters` will indicate directions for how to build the state.
-- `state_parameters`: 
+	- The 2nd element in `state_specs` represents the variable 'build_state'. 
+	In particular, if 'build_state' is True, then the state will be built randomly according to the directions provided by the 3rd element in `state_parameters`. 
+	Again, note that the 3rd element in `state_parameters` will indicate directions for how to build the state.
+- `state_parameters`: This argument is a tuple of length 3. 
+The purpose of the 3rd element in the tuple will change depending on whether the 1st or 2nd element of `state_specs` is true. 
+	- The 1st element in `state_parameters` represents the variable 'mean_samples_per_state' which is a non-negative integer. 
+	In particular, 'mean_samples_per_state' represents the average number of grid locations desired by the user. A grid location is a small piece of the state that contains some positive number of census blocks. 
+	An acceptable number of grid locations depends on the population of the state, the `sampling_parameter` when `sampling_method=='diam' or sampling_method=='rect'`, and on whether 'mimic_city' (8th element of `support_parameters`) is True or False. 
+	A value of 'mean_samples_per_state' that is too large will mean that each grid location contains one census block, which will make the state look incredibly sparse when `sampling_method=='window'` and incredibly dense when `sampling_method=='diam' or sampling_method=='rect'`. 
+	A value of 'mean_samples_per_state' that is too small will have the opposite effect. 
+	If `mimic_city==True`, then the number of census blocks per grid location will mimic the city by setting the number of census blocks per grid location to $$2$$
+	The actual number of grid locations 
+	- The 2nd element in `state_parameters`
+	- The 3rd element in `state_parameters`
 - `sampling_merging_method`:
 - `sampling_parameter`:
 - `use_specs`:
