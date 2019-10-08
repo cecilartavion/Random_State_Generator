@@ -137,10 +137,29 @@ The purpose of the 3rd element in the tuple will change depending on whether the
 	An acceptable number of grid locations depends on the population of the state, the `sampling_parameter` when `sampling_method=='diam' or sampling_method=='rect'`, and on whether 'mimic_city' (8th element of `support_parameters`) is True or False. 
 	A value of 'mean_samples_per_state' that is too large will mean that each grid location contains one census block, which will make the state look incredibly sparse when `sampling_method=='window'` and incredibly dense when `sampling_method=='diam' or sampling_method=='rect'`. 
 	A value of 'mean_samples_per_state' that is too small will have the opposite effect. 
-	If `mimic_city==True`, then the number of census blocks per grid location will mimic the city by setting the number of census blocks per grid location to $$2$$
-	The actual number of grid locations 
-	- The 2nd element in `state_parameters`
-	- The 3rd element in `state_parameters`
+	The actual number of grid locations (called 'samples_per_state') is set by finding a random number using a normal distribution with mean equal to 'mean_samples_per_state' and with standard deviation equal to the standard deviation of the population over all of the census blocks in the original state.
+	If `mimic_city==True`, then the number of census blocks per grid location will mimic the city by setting the number of census blocks per grid location to (sum of total population)/((samples_per_state)(average state population per census block)). 
+	- The 2nd element in `state_parameters` represents the variable 'water' which is a boolean variable. 
+	If `water==True`, then all census blocks that contain only water (no land) will be deleted from the possible set of census blocks that can be chosen during the construction of the state.
+	- The 3rd element in `state_parameters` represents either a state (possibly not the same as `state`) when `state_shape==True` or a variable called 'grid_placement' (a tuple of length 2, 3, or 4) when `build_state==True`. 
+		- If `state_shape==True`, then the 3rd element in `state_parameters` represents a state (call this variable 'state2') that may or may not be the same as that specified in the `state` argument. 
+		The value for 'state2' will follow the same restrictions as specified for `state`. 
+		The value for 'state2' will indicate for which state will the approximate shape of the state resemble. For example, if `state=='44'` and `state2=='47'`, then all census blocks, census block adjacency information, and census block data will come from Rhode Island (state FIPS code 44), and the overall shape of the state will come from Tennessee (state FIPS code 47). 
+		- If `build_state==True`, then the 3rd element in `state_parameters` represents the variable 'grid_placement' which is a tuple of length 2, 3, or 4.
+		The grid locations depend on the 1st element of 'grid_placement'. The first element of 'grid_placement' is always a string and the remaining elements are positive integers. 
+		The possible values for the first element of 'grid_placement' are as follows: 'random', 'fixed', and 'mixed'.
+		The first element of 'grid_placement' describes the method used to build the overall shape of the countryside and possibly the overall shape of the cities as well (depending on the value of `use_specs`). 
+		The length of the tuple 'grid_placement' is 2, 3, or 4 if the first element of 'grid_placement' is 'random', 'fixed', or 'mixed' respectively. 
+		In what follows, I describe the function of 'random', 'fixed', and 'mixed' as well as the remaining elements of the tuple 'grid_placement.
+			- When the 1st element of 'grid_placement' is 'random', the first grid location of census blocks is placed at (0,0) (using Cartesian coordinate system, that is, x,y coordinate locations). 
+			Then all of the subsequent samples are placed iteratively at adjacent integer coordinates so that each new grid location is 1 away (in either the x- or y-direction) from another grid location already placed. 
+			So for example, the second grid location has option of being placed at (0,1), (1,0), (-1,0), or (0,-1). 
+			As the name suggest, the second grid location is randomly choosen from among these 4 options. 
+			- When the 2nd element of 'grid_placement' is 'fixed', let ('fixed',m,n) be a generic representation of 'grid_placement' tuple. 
+			Then the grid locations will form a rectangular m by n grid using mn grid locations. 
+			The first sample is placed in location (0,0) and the rectangle is constructed with corners (0,0), (m-1,0), (n-1,0), and (m-1,n-1). 
+			- When the 1st element of 'grid_placement' is 'mixed', let ('mixed',m,n,p) be a generic representation of the 'grid_placement' tuple.  
+			Then the grid locations with form a rectangular m by n grid using mn samples as when the 1st element of 'grid_placement' was 'fixed'. Then p additional grid locations are added to the m by n rectangle iteratively as when the 1st element of 'grid_placement' was set to 'random'. In total, there will be mnp samples.
 - `sampling_merging_method`:
 - `sampling_parameter`:
 - `use_specs`:
@@ -179,15 +198,7 @@ The options for elements in the list are the following:
 If the second coordinate is 1, a json file of the graph with the data will be saved into a folder called OUTPUT. 
 
 
-- `grid_placement`: A tuple of length 2, 3, or 4. 
-The grid corresponds to how each sample of `sample_num` census blocks is placed in the countryside.
-The first element of each tuple describes the method used to build the countryside and possible the cities. 
-The method options are 'random', 'fixed', and 'mixed' and must be given as strings. 
-The remaining elements in each tuple are positive integers.  For the tuple lengths, the method corresponds to the length of the tuple. 
-That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixed', and 'mixed' respectively. 
-  - When the method is set to 'random', the first sample of census blocks is placed at grid location (0,0) (x,y coordinate locations). Then all of the subsequent samples are placed iteratively around what has been constructed so far for the grid. So for the second sample, the possible locations would be (0,1), (1,0), (-1,0), and (0,-1). 
-  - When `grid_placement` is set to ('fixed',m,n), a rectangular m by n grid is made using mn samples. The first sample is placed in location (0,0) and the rectangle is constructed with corners (0,0), (a-1,0), (b-1,0), and (a-1,b-1). 
-  - When `grid_placement` is set to ('mixed',m,n,p), a rectangular m by n grid is made using mn samples like when the method was 'fixed'. Then p additional samples of census blocks are added iteratively to the boundary of the rectangle using the 'random' method. In total, there will be mnp samples.
+
 - `sampling_method`: A string which represents how each sample is built. The options for this string are 'rect' and 'diam'. 
   - For 'rect', a random census block is chosen (urban or rural depends which part of the code this variable is executed). 
   Then a window is drawn around one census block. 
