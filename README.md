@@ -201,7 +201,14 @@ The purpose of the 3rd element in the tuple will change depending on whether the
 		Then join the vertices of the centroids of census blocks according to the order we found above. 
 		That is, add the following edges to the graph so that the resulting graph is connected: {c_1,c_1}, {c_1,d_2}, {c_1,d_2}, {c_3,d_3}, {c_3,d_4}, {c_4,d_5}, {c_5,d_6}, {c_4,d_7}, {c_4,d_7}, {c_6,d_7}, {c_6,d_8}. 
 		WARNING: It is possible that by doing this merging method, the resulting graph may not be planar. 
-- `sampling_parameter`:
+- `sampling_parameter`: This argument is an integer, but its function depends on whether `sampling_method=='window'` or `sampling_method=='rect' or sampling_method=='rect'`. 
+	- If `sampling_method=='window'`, then `sampling_parameter` represents the variable 'min_gridloc_size'. 
+	This variable must be a positive integer. 
+	'min_grid_size' represents the minimum allowable number of census blocks in a grid location when building a sample of census blocks using the 'window' method.
+	- If `sampling_method=='rect' or sampling_method=='rect'`, then `sampling_parameter` represents the variable 'sample_num'. 
+	This variable must be a positive integer. 
+	'sample_num' represents the minimum number of census blocks allowed in a grid location when building a sample of census blocks using the 'diam' or 'rect' methods. 
+	Note that it is possible that 'sample_num' may be overwritten if `mimic_city==True`. 
 - `use_specs`:
 - `use_parameters`:
 - `city_specs`: 
