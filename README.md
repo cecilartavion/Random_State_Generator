@@ -292,59 +292,58 @@ The options for elements in the list are the following:
 'NHPIVAP',
 '2MOREVAP', and
 'OTHERVAP'.
+- `support_parameters`: a tuple of length 9 whose elements represent the variables 'mod', 'mod_prob', 'mono_rural_ur', 'mono_city_ur', 'pop_cat', 'maxiter', 'min_city_pop', 'mimic_city', and 'interval_prob'. 
+	- 'mod' is a string that represents the modification that is to be made on each sample.
+	This modification would be to the edges between census blocks in the sample or the vertices (census blocks) themselves. 
+	The options for modification are as follows: 'add_vert', 'add_edges', 'add_remove_edges', 'delete_vert', 'delete_edges', and 'none'.
+	WARNING: It is possible that all of these modification may make the graph non-planar. 
+	The purpose of modifying the graph is to create random samples that are similar to the original sample graphically, but not exactly the same. 
+		- 'add_vert': Adds a vertex to a random face uniformly at random and adds a random number of edges based on 'mod_prob' probability. The sample must be planar for this to work. Currently, this method is suppressed since it is not clear how to generate data out of nowhere for the new census block.
+		- 'add_edges': Add a random number of edges between vertices based on the 'mod_prob' probability while retaining planarity. The sample must be planar in order for any edges to be added. 
+		- 'add_remove_edges': Add and remove a random number of edges based on the 'mod_prob' probability while retaining planarity. The sample must be planar in order for any edges to be added. 
+		- 'delete_vert': A random probability of vertices are deleted based on the 'mod_prob' probability. It is possible the sample becomes disconnected.
+		- 'delete_edges': A random probability of edges are deleted based on the 'mod_prob' probability. It is possible the sample becomes disconnected.
+		- 'none': No modification is made. 
+	- 'mod_prob' is a float between 0 and 1 that represents the probability of a change occurring based on the modification selected in 'mod'.
+	- 'mono_rural_ur' is a binary variable that is either 0 or 1. This variable determines whether urban census blocks are allowed to be included when building the countryside. 
+	If 'mono_rural_ur' equals 1, then only rural census blocks are allowed in the construction of the countryside. Otherwise, urban census blocks are allowed to be included. 
+	- 'mono_city_ur': A binary variable that is either 0 or 1. This variable determines whether rural census blocks are allowed to be included when building the countryside. 
+	If 'mono_city_ur' equals 1, then only urban census blocks are allowed in the construction of the city samples. Otherwise, rural census blocks are allowed to be included. 
+	- 'pop_cat': integer or string. The only string accepted is 'all'. The intergers allowed are from 0 to the length of the population division. The population is currently divided into cities with 
+	less than 50,000 people (0), 
+	between 50,000 and 60,000 people (1),
+	between 60,000 and 70,000 people (2),
+	between 70,000 and 80,000 people (3), 
+	between 80,000 and 90,000 people (4), 
+	between 90,000 and 100,000 people (5),
+	between 100,000 and 200,000 people (6),
+	between 200,000 and 300,000 people (7),
+	between 300,000 and 400,000 people (8),
+	between 400,000 and 500,000 people (9),
+	between 500,000 and 600,000 people (10),
+	between 600,000 and 700,000 people (11),
+	between 700,000 and 800,000 people (12),
+	between 800,000 and 900,000 people (13),
+	between 900,000, and 1,000,000 people (14),
+	between 1 and 2 million people (15),
+	between 2 and 3 million people (16), 
+	between 3 and 4 million people (17), 
+	between 4 and 5 million people (18), 
+	between 5 and 6 million people (19), 
+	between 6 and 7 million people (20), 
+	between 7 and 8 million people (21), 
+	and over 8 million people  (22). 
+	The population between 50K and 60K are labeled as 0 in 'pop_cat' and increases incrementally as the population increases. 
+	Another option is to set the variable to 'all' which indicates that all city sizes are possible in the creation of new cities. 
+	- 'maxiter' is the maximum number of iterations allowed in any process throughout the program. 
+	- 'min_city_pop' is the minimum city population when deciding on how to determine which cities the program will use when building the cities. This variable is only relevant if the 1st element of `city_specs` is 2 or 3. 
+	- 'mimic_city' is a boolean variable that determines if some of the parameters will mimic characteristics of the original state. One parameter that will be overwritten if `mimic_city==True` is the minimum number of census blocks per grid location. 
+	In this case, the minimum number of census blocks per grid location is equal to (sum of total population)/((samples_per_state)(average state population per census block)).
+	The other parameter that is changed is the 'grid_placement' variable. When `mimic_city==True`, the number of grid locations is based on (sum of total population)/((samples_per_state)(average state population per census block)). 
+	- 'interval_prob' is a probability associated to edges when the `merge_method=='interval'`. This probability is the mean used to determine the probability of whether an edge should be kept. That is, a Gaussian random number is chosen to the this probability, say p, by using the value 'interval_prob' as the mean and 0.1 as the standard deviation. This is set to 0.8 by default. The probability p is taken and multiplied by the number of edges joining two samples and the floor of this product is the number of edges that will be used to join two samples. Uniformly at random, edges are chosen to be joined between the two samples. 
 - `save_status`: A binary tuple of length 2. If the first coordinate is 1, a png will be save of the final graph after cities have been merged into the graph. In the png image, the red vertices represent the rural census blocks while the blue vertices represent the cities. 
 If the second coordinate is 1, a json file of the graph with the data will be saved into a folder called OUTPUT. 
 
-
-
-
-- `sample_num`: two digit string that represents the approximate number of census blocks in each sample taken. 
-- `pop_category`: integer or string. The only string accepted is 'all'. The intergers allowed are from 0 to the length of the population division. The population is currently divided into cities with 
-less than 50,000 people (0), 
-between 50,000 and 60,000 people (1),
-between 60,000 and 70,000 people (2),
-between 70,000 and 80,000 people (3), 
-between 80,000 and 90,000 people (4), 
-between 90,000 and 100,000 people (5),
-between 100,000 and 200,000 people (6),
-between 200,000 and 300,000 people (7),
-between 300,000 and 400,000 people (8),
-between 400,000 and 500,000 people (9),
-between 500,000 and 600,000 people (10),
-between 600,000 and 700,000 people (11),
-between 700,000 and 800,000 people (12),
-between 800,000 and 900,000 people (13),
-between 900,000, and 1,000,000 people (14),
-between 1 and 2 million people (15),
-between 2 and 3 million people (16), 
-between 3 and 4 million people (17), 
-between 4 and 5 million people (18), 
-between 5 and 6 million people (19), 
-between 6 and 7 million people (20), 
-between 7 and 8 million people (21), 
-and over 8 million people  (22). 
-The population between 50K and 60K are labeled as 0 in `pop_category` and increases incrementally as the population increases. 
-Another option is to set the variable to 'all' which indicates that all city sizes are possible in the creation of new cities. 
-
-- `mod`: string that represents the modification that is to be made on each sample.
-This modification would be to the edges between census blocks in the sample or the vertices (census blocks) themselves. 
-The options for modification are as follows: 'add_vert', 'add_edges', 'add_remove_edges', 'delete_vert', 'delete_edges', and 'none'.
-WARNING: It is possible that all of these modification may make the graph non-planar. 
-WARNING: add_vert is suppressed at the moment since no method was implemented to build the data from a new vertex that is added to the graph. 
-The purpose of modifying the graph is to create random samples that are similar to the original sample graphically, but not exactly the same. 
-  - 'add_vert': Adds a vertex to a random face uniformly at random and adds a random number of edges based on `mod_prob` probability. The sample must be planar for this to work. Currently, this method is suppressed since it is not clear how to generate data out of nowhere for the new census block.
-  - 'add_edges': Add a random number of edges between vertices based on the `mod_prob` probability while retaining planarity. The sample must be planar in order for any edges to be added. 
-  - 'add_remove_edges': Add and remove a random number of edges based on the `mod_prob` probability while retaining planarity. The sample must be planar in order for any edges to be added. 
-  - 'delete_vert': A random probability of vertices are deleted based on the `mod_prob` probability. It is possible the sample becomes disconnected.
-  - 'delete_edges': A random probability of edges are deleted based on the `mod_prob` probability. It is possible the sample becomes disconnected.
-  - 'none': No modification is made. 
-- `mod_prob`: A Float between 0 and 1 that represents the probability of a change occurring based on the modification selected in `mod`.
-- `interval_prob`: Probability associated when the merge_method is 'interval'. This probability is the mean used to determine the probability of whether an edge should be kept. That is, a Gaussian random number is chosen to the this probability, say p, by using the value `interval_prob` as the mean and 0.1 as the standard deviation. This is set to 0.8 by default. The probability p is taken and multiplied by the number of edges joining two samples and the floor of this product is the number of edges that will be used to join two samples. Uniformly at random, edges are chosen to be joined between the two samples. 
-- `mono_rural_ur`: A binary variable that is either 0 or 1. This variable determines whether urban census blocks are allowed to be included when building the countryside. 
- If `mono_rural_ur` equals 1, then only rural census blocks are allowed in the construction of the countryside. Otherwise, urban census blocks are allowed to be included. 
-- `mono_city_ur`: A binary variable that is either 0 or 1. This variable determines whether rural census blocks are allowed to be included when building the countryside. 
- If `mono_city_ur` equals 1, then only urban census blocks are allowed in the construction of the city samples. Otherwise, rural census blocks are allowed to be included. 
-- `mean_samples_per_state`: A positive integer that represents the average number of samples that will be used to build the countryside. A standard number for this would be around 1000. If `mean_samples_per_state` is too large, there will be one census block per sample, which is undesirable for many reasons. If `mean_samples_per_state` is too small, there will be so few samples used to build the map, it will hardly look like a state and there will be large sections of the map that will be copy pasted directly from the state. 
 
 
 An example of a fully filled out command to run in the terminal would be the following:
