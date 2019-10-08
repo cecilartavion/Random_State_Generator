@@ -209,9 +209,26 @@ The purpose of the 3rd element in the tuple will change depending on whether the
 	This variable must be a positive integer. 
 	'sample_num' represents the minimum number of census blocks allowed in a grid location when building a sample of census blocks using the 'diam' or 'rect' methods. 
 	Note that it is possible that 'sample_num' may be overwritten if `mimic_city==True`. 
-- `use_specs`:
-- `use_parameters`:
-- `city_specs`: 
+- `use_specs`: This argument is a tuple of length 3 where each element is boolean. At least one and at most three elements in `use_specs` must be True. 
+If the third element of `use_specs` is True, then the first two elements must be False. 
+Note that when the second element is True, the first element being True or False has no impact on the outcome of the new state. 
+The three elements of `use_specs` represent the variables 'use_cities', 'use_both_cities_and_urban', and 'use_ssa'. 
+	- Suppose that only 'use_cities' is True in `use_specs`. 
+	Then once the countryside is completed, only cities will be built. The cities will be built according the 'city_placement' variable in `use_parameters`. 
+	- Suppose that only 'use_both_cities_and_urban' is True in `use_specs`. Then once the countryside is completed, cities will be built according the 'city_placement' variable in `use_parameters`. 
+	After the cities are built, the difference between the number of urban grid locations in the current state and the original state will be the number of individual grid locations that primarily contain urban census blocks will be added to the countryside. 
+	The manner in which these individual grid locations are added depends on 'city_placement' variable. 
+	- Suppose that only 'use_ssa' is True in `use_specs`. Then only individual grid locations will be added to the countryside iteratively. 
+	The coordinates of the individual grid locations is fixed and determined by running a modified version of the  Schelling Segregation Algorithm. For an indepth explanation of this algorithm, see the discussion in a section below. 
+	The manner in which these individual grid locations are added depends the `use_parameters`. 
+- `use_parameters`: This argument is a tuple 
+- `city_specs`: This argument is a tuple that will help determine the number of cities using various methods. 
+The possible values for the first coordinate are 0, 1, 2, and 3. The lengths of the tuple depends on the first coordinate. If the first coordinate is 0, 1, 2, or 3, then the length of the tuple is 2, 3, 2, 2 respectively. 
+  -If the first coordinate is 0, then the number of samples used to build a city is the value in the second coordinate of the `city_specs` tuple. 
+  -If the first coordinate is 1 and the tuple is (1,x,y), then x is a string that represents the 2-digit code for one of the possible states listed above in `state`, and y is an integer greater than or equal to 1000. The number of cities when the first coordinate is 1 is the number of cities in state x with a population over y people.
+  -If the first coordinate is 2 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. 
+The number of cities when the first coordinate is 2 is equal to the number of cities over a population of 5000 in state x. 
+  -If the first coordinate is 3 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. The number of cities when the first coordinate is 2 is equal to the number of cities over a population of 5000 in state x. The sizes of the cities will be the same sizes as those that appear in state x. 
 - `noisy_parameters`: A binary tuple of length 3. The three elements indicate for which data will noise be added.
 If the first coordinate is 1, the total population will have random Gaussian noise added. If the second coordinate is 1, the variables in `demo_cols` will have random noise added. If the third coordinate is 1, the vote totals will have random noise added.
 WARNING: Currently, there is no vote total column, so anything but 0 will likely produce an error, or it should produce an error if it does not. 
@@ -274,13 +291,7 @@ between 7 and 8 million people (21),
 and over 8 million people  (22). 
 The population between 50K and 60K are labeled as 0 in `pop_category` and increases incrementally as the population increases. 
 Another option is to set the variable to 'all' which indicates that all city sizes are possible in the creation of new cities. 
-- `city_specs`: tuple that will help determine the number of cities using various methods. 
-The possible values for the first coordinate are 0, 1, 2, and 3. The lengths of the tuple depends on the first coordinate. If the first coordinate is 0, 1, 2, or 3, then the length of the tuple is 2, 3, 2, 2 respectively. 
-  -If the first coordinate is 0, then the number of samples used to build a city is the value in the second coordinate of the `city_specs` tuple. 
-  -If the first coordinate is 1 and the tuple is (1,x,y), then x is a string that represents the 2-digit code for one of the possible states listed above in `state`, and y is an integer greater than or equal to 1000. The number of cities when the first coordinate is 1 is the number of cities in state x with a population over y people.
-  -If the first coordinate is 2 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. 
-The number of cities when the first coordinate is 2 is equal to the number of cities over a population of 5000 in state x. 
-  -If the first coordinate is 3 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. The number of cities when the first coordinate is 2 is equal to the number of cities over a population of 5000 in state x. The sizes of the cities will be the same sizes as those that appear in state x. 
+
 - `mod`: string that represents the modification that is to be made on each sample.
 This modification would be to the edges between census blocks in the sample or the vertices (census blocks) themselves. 
 The options for modification are as follows: 'add_vert', 'add_edges', 'add_remove_edges', 'delete_vert', 'delete_edges', and 'none'.
@@ -341,6 +352,10 @@ The '3' and '4' represent the length and width of the rectangle built using the 
 - `mono_city_ur` is set to 0. That is, when building the citites, rural census blocks are allowed to contain rural census blocks. 
 - `mean_samples_per_state` is set to 1000. That is, the average number of samples that will be used to build the countryside is 1000. 
 - `city_placement` is set to 'random'. That is, each city will be randomly inserted into the countryside. 
+
+# Schelling Segregation Algorithm
+
+Insert discussion for this algorithm here. 
 
 # Images 
 The files in images are examples of instances run by text_main.py. The description of each is recorded based on the same variables and order as listed above. 
