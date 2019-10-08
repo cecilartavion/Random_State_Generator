@@ -111,8 +111,13 @@ The possible two-digit values and their corresponding states are as follows:
 56 -- Wyoming.
 Both Alaska and Hawaii are not included because of contiguity complications.
 - `state_specs`: This argument is a tuple of length 2 with binary elements. Exactly one of the elements in the tuple must be True. 
-	- The first element in the tuple represents the variable 'state_shape'. In particular, if 
+	- The first element in the tuple represents the variable 'state_shape'. 
+	In particular, if 'state_shape' is True, then the coordinates for the grid locations will form an approximate shape of a state based on the 'mean_samples_per_state' value. 
+	Note that when 'state_shape' is set to True, the third element in `state_parameters` will indicate the state for which the program will approximate the shape of a state. 
+	That means the distributions of population can be applied to the particular shape of a different state, thus allowing for the ability to determine the effects of shape and distribution on the state. 
 	- The second element in the tuple represents the variable 'build_state'. 
+	In particular, if 'build_state' is True, then the state will be built randomly according to the directions provided by the third element in `state_parameters`. 
+	Again, note that the third element in `state_parameters` will indicate directions for how to build the state.
 - `state_parameters`: 
 - `sampling_merging_method`:
 - `sampling_parameter`:
