@@ -58,6 +58,7 @@ To run the code, change working directory to the file that contains "test_main.p
 ```
 run random_state_generator.py state state_specs state_parameters sampling_merging_method sampling_parameter use_specs use_parameters city_specs noisy_parameters demo_cols support_parameters save_status
 ```
+Here is a description of each variable in the above script:
 - `state`: either the string 'random' or a two digit string that represents the U.S. from which data is sampled. 
 The possible two-digit values and their corresponding states are as follows:
 01 -- Alabama, 
@@ -109,8 +110,46 @@ The possible two-digit values and their corresponding states are as follows:
 55 -- Wisconsin,
 56 -- Wyoming.
 Both Alaska and Hawaii are not included because of contiguity complications.
+- `state_specs`: 
+- `state_parameters`: 
+- `sampling_merging_method`:
+- `sampling_parameter`:
+- `use_specs`:
+- `use_parameters`:
+- `city_specs`: 
+- `noisy_parameters`: A binary tuple of length 3. The three elements indicate for which data will noise be added.
+If the first coordinate is 1, the total population will have random Gaussian noise added. If the second coordinate is 1, the variables in `demo_cols` will have random noise added. If the third coordinate is 1, the vote totals will have random noise added.
+WARNING: Currently, there is no vote total column, so anything but 0 will likely produce an error, or it should produce an error if it does not. 
+- `demo_cols`: A list of strings where each string represents the demographic columns that will have Gaussian random noise applied to each census block in each of the samples. 
+The options for elements in the list are the following: 
+'NH_WHITE',
+'NH_BLACK',
+'NH_2MORE',
+'NH_AMIN',
+'NH_ASIAN',
+'NH_NHPI',
+'NH_OTHER',
+'HISP',
+'H_2MORE',
+'H_AMIN',
+'H_ASIAN',
+'H_BLACK',
+'H_NHPI',
+'H_OTHER',
+'H_WHITE',
+'VAP',
+'WVAP',
+'BVAP',
+'HVAP',
+'AMINVAP',
+'ASIANVAP',
+'NHPIVAP',
+'2MOREVAP', and
+'OTHERVAP'.
+- `save_status`: A binary tuple of length 2. If the first coordinate is 1, a png will be save of the final graph after cities have been merged into the graph. In the png image, the red vertices represent the rural census blocks while the blue vertices represent the cities. 
+If the second coordinate is 1, a json file of the graph with the data will be saved into a folder called OUTPUT. 
 
-Here is a description of each variable in the above script:
+
 - `grid_placement`: A tuple of length 2, 3, or 4. 
 The grid corresponds to how each sample of `sample_num` census blocks is placed in the countryside.
 The first element of each tuple describes the method used to build the countryside and possible the cities. 
@@ -202,37 +241,6 @@ The purpose of modifying the graph is to create random samples that are similar 
   - 'delete_edges': A random probability of edges are deleted based on the `mod_prob` probability. It is possible the sample becomes disconnected.
   - 'none': No modification is made. 
 - `mod_prob`: A Float between 0 and 1 that represents the probability of a change occurring based on the modification selected in `mod`.
-- `demo_cols`: A list of strings where each string represents the demographic columns that will have Gaussian random noise applied to each census block in each of the samples. 
-The options for elements in the list are the following: 
-'NH_WHITE',
-'NH_BLACK',
-'NH_2MORE',
-'NH_AMIN',
-'NH_ASIAN',
-'NH_NHPI',
-'NH_OTHER',
-'HISP',
-'H_2MORE',
-'H_AMIN',
-'H_ASIAN',
-'H_BLACK',
-'H_NHPI',
-'H_OTHER',
-'H_WHITE',
-'VAP',
-'WVAP',
-'BVAP',
-'HVAP',
-'AMINVAP',
-'ASIANVAP',
-'NHPIVAP',
-'2MOREVAP', and
-'OTHERVAP'.
-- `sampling_parameters`: A binary tuple of length 3. The three elements indicate for which data will noise be added.
-If the first coordinate is 1, the total population will have random Gaussian noise added. If the second coordinate is 1, the variables in `demo_cols` will have random noise added. If the third coordinate is 1, the vote totals will have random noise added.
-WARNING: Currently, there is no vote total column, so anything but 0 will likely produce an error, or it should produce an error if it does not. 
-- `save_status`: A binary tuple of length 2. If the first coordinate is 1, a png will be save of the final graph after cities have been merged into the graph. In the png image, the red vertices represent the rural census blocks while the blue vertices represent the cities. 
-If the second coordinate is 1, a json file of the graph with the data will be saved into a folder called OUTPUT. 
 - `interval_prob`: Probability associated when the merge_method is 'interval'. This probability is the mean used to determine the probability of whether an edge should be kept. That is, a Gaussian random number is chosen to the this probability, say p, by using the value `interval_prob` as the mean and 0.1 as the standard deviation. This is set to 0.8 by default. The probability p is taken and multiplied by the number of edges joining two samples and the floor of this product is the number of edges that will be used to join two samples. Uniformly at random, edges are chosen to be joined between the two samples. 
 - `mono_rural_ur`: A binary variable that is either 0 or 1. This variable determines whether urban census blocks are allowed to be included when building the countryside. 
  If `mono_rural_ur` equals 1, then only rural census blocks are allowed in the construction of the countryside. Otherwise, urban census blocks are allowed to be included. 
