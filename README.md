@@ -221,7 +221,41 @@ The three elements of `use_specs` represent the variables 'use_cities', 'use_bot
 	- Suppose that only 'use_ssa' is True in `use_specs`. Then only individual grid locations will be added to the countryside iteratively. 
 	The coordinates of the individual grid locations is fixed and determined by running a modified version of the  Schelling Segregation Algorithm. For an indepth explanation of this algorithm, see the discussion in a section below. 
 	The manner in which these individual grid locations are added depends the `use_parameters`. 
-- `use_parameters`: This argument is a tuple 
+- `use_parameters`: This argument is a tuple of length either 4 or 5 depending on whether one of the first two elements in `use_specs` is True or not respectively. 
+	- Suppose that `use_specs==(True,False,False)`, `use_specs==(True,True,False)` or `use_specs==(False,True,False)`. 
+	Then `use_parameters` is a tuple of length 5 where the elements of the tuple represent the variables 'city_placement', 'mute_factor', 'silence_factor', 'rand_city_locs', and 'min_u_cbs'. 
+		- 'city_placement' is a variable that is either a tuple of length 4 or a string. All of the different options for `city_placement` will affect the distribution of where to place the next city in the countryside. 
+		That is, a probability distribution will be placed at each grid location and when it is time to place the city in the countryside, a grid location will be randomly selected based on this probability distribution. 
+			-If `city_placement` is a tuple, the first element must be 'neighbor_cluster' and the tuple has the form ('neighbor_cluster',u_score,r_score,u_penalty). 
+			Both u_score and r_score are non_negative numbers (not at the same time) value for the prevelance of being closer or farther away from an urban location.
+			Specifically, for each census block x, the neighbors of x are summed together based on the value of u_score and r_score. 
+			Then the total is penalized by a factor of u_penalty (positive number) if x is going to land on an urban census block. 
+			Finally, all scores are normalized so that their sum is 1. 
+			- If `city_placement` is a string equal to 'random', then the probability distribution is a uniform probability distribution.
+			- If `city_placement` is a string equal to 'grid_gaussian_kde', then the probability distribution is formed using gaussian_kde from the scipy package.
+			Kernel density estimation is a way to estimate the probability density function (PDF) of a random variable in a non-parametric way. 
+			gaussian_kde works for both uni-variate and multi-variate data. It includes automatic bandwidth determination.
+			For our implementation of the gaussian_kde, the kernel is formed by giving the function of all the grid locations that are urban (>50% census blocks that are urban means the grid location is urban).
+			In this way, the probability of landing on an urban census block is higher than that of landing on a rural census block. 
+			Additionally, the probability distribution starts at a uniform value equal to the mean of the probabilities for urban and rural census blocks, and then the probability distribution is added to this, so as to increase the probability of choosing a random grid location that is rural. 
+			- If `city_placement` is a string equal to 'grid_gaussian_kde', then a similar procedure as when `city_placement` was equal to 'grid_gaussian_kde' will take place to determine the probability distribution.
+			The main difference is that the kernel function is constructed using the actual locations of all the census blocks in all grid locations. 
+			This gives a more representative kernel distribution function, however, it will take longer to build the kernel. 
+		- The 'mute_factor' will mute the effects of adding the mean of the probabilities to each of the countryside locations when creating the probability distribution function that will randomly determine where the next grid location will be placed. The 'mute_factor' is a positive float or integer.
+		The higher the mute_factor, the less that adding the mean to all of the probabilities will impact the pdf. 
+		That is, the pdf will mostly resemble what was found by the kernel density estimation when mute_factor>1000 since the mean of the all probabilities found by the kernel density estimation is being divided by mute_factor.
+		A mute_factor of 1 means that we simply add the mean of the probabilities found by the kernel densisty estimation to all grid locations. 
+		A mute_factor less than 1 but greater than 0 will make the mean of the probabilities found by the kernel density estimation have a larger influence on the final pdf. A mute_factor close to 0 will make it like a uniform distribution. 
+		- Similar to the 'mute_factor', the 'silence_factor' will turn off and on the ability to add the mean of the kernel density estimation to the pdf found by the kernel density estimation. 
+		The 'silence_factor' is a non-negative float or integer.
+		A 'silence_factor' of 1 means that the mean of the kernel density estimation will be added to the pdf found by the kernel density estimation. 
+		A 'silence_factor' of 0 means that the mean of the kernel density estimation will not be added to the pdf found by the kernel density estimation. 
+		- The 'rand_city_locs' variable is a boolean variable for determining how the individual grid locations (not the cities) will be placed. 
+		If `rand_city_locs==True`, then the urban census blocks are randomly placed around the state. However, if `rand_city_locs==False`, then the urban census blocks are placed close to where they were in the original state. This only works when the variable use_cities is set to False.
+		- The 'min_u_cbs' variable is a non-negative integer. 
+		While placing the individual grid locations (not the cities), 'min_u_cbs' represents the minimum allowed number of urban census blocks in a grid location when trying to detect how many census blocks are in a grid location.
+	- Suppose that `use_specs==(False,False,True)`. 
+	Then `use_parameters` is a tuple of length 4 where the elements of the tuple represent the variables 'ratio', 'iterations', 'nbr_dist', and 'no_isolates'. See the section below on the Schelling Segregation Algorithm for a description of these variables.
 - `city_specs`: This argument is a tuple that will help determine the number of cities using various methods. 
 The possible values for the first coordinate are 0, 1, 2, and 3. The lengths of the tuple depends on the first coordinate. If the first coordinate is 0, 1, 2, or 3, then the length of the tuple is 2, 3, 2, 2 respectively. 
   -If the first coordinate is 0, then the number of samples used to build a city is the value in the second coordinate of the `city_specs` tuple. 
@@ -311,23 +345,7 @@ The purpose of modifying the graph is to create random samples that are similar 
 - `mono_city_ur`: A binary variable that is either 0 or 1. This variable determines whether rural census blocks are allowed to be included when building the countryside. 
  If `mono_city_ur` equals 1, then only urban census blocks are allowed in the construction of the city samples. Otherwise, rural census blocks are allowed to be included. 
 - `mean_samples_per_state`: A positive integer that represents the average number of samples that will be used to build the countryside. A standard number for this would be around 1000. If `mean_samples_per_state` is too large, there will be one census block per sample, which is undesirable for many reasons. If `mean_samples_per_state` is too small, there will be so few samples used to build the map, it will hardly look like a state and there will be large sections of the map that will be copy pasted directly from the state. 
-- `city_placement`: A variable that is either a tuple of length 4 or a string. All of the different options for `city_placement` will affect the distribution of where to place the next city in the countryside. 
-That is, a probability distribution will be placed at each grid location and when it is time to place the city in the countryside, a grid location will be randomly selected based on this probability distribution. 
-  -If `city_placement` is a tuple, the first element must be 'neighbor_cluster' and the tuple has the form ('neighbor_cluster',u_score,r_score,u_penalty). 
-  Both u_score and r_score are non_negative numbers (not at the same time) value for the prevelance of being closer or farther away from an urban location.
-  Specifically, for each census block x, the neighbors of x are summed together based on the value of u_score and r_score. 
-  Then the total is penalized by a factor of u_penalty (positive number) if x is going to land on an urban census block. 
-  Finally, all scores are normalized so that their sum is 1. 
-  - If `city_placement` is a string equal to 'random', then the probability distribution is a uniform probability distribution.
-  - If `city_placement` is a string equal to 'grid_gaussian_kde', then the probability distribution is formed using gaussian_kde from the scipy package.
-  Kernel density estimation is a way to estimate the probability density function (PDF) of a random variable in a non-parametric way. 
-  gaussian_kde works for both uni-variate and multi-variate data. It includes automatic bandwidth determination.
-  For our implementation of the gaussian_kde, the kernel is formed by giving the function of all the grid locations that are urban (>50% census blocks that are urban means the grid location is urban).
-  In this way, the probability of landing on an urban census block is higher than that of landing on a rural census block. 
-  Additionally, the probability distribution starts at a uniform value equal to the mean of the probabilities for urban and rural census blocks, and then the probability distribution is added to this, so as to increase the probability of choosing a random grid location that is rural. 
-  - If `city_placement` is a string equal to 'grid_gaussian_kde', then a similar procedure as when `city_placement` was equal to 'grid_gaussian_kde' will take place to determine the probability distribution.
-  The main difference is that the kernel function is constructed using the actual locations of all the census blocks in all grid locations. 
-  This gives a more representative kernel distribution function, however, it will take longer to build the kernel. 
+
 
 An example of a fully filled out command to run in the terminal would be the following:
 ```
