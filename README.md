@@ -348,9 +348,9 @@ If the second coordinate is 1, a json file of the graph with the data will be sa
 
 An example of a fully filled out command to run in the terminal would be the following:
 ```
-run test_main.py ('mixed',3,4,5) diam intervals 50 '44' all (0,5) none 0.5 ('BVAP','HVAP','WVAP','VAP') (1,1,0) (1,1) 0.8 1 0 1000 random
+run random_state_generator.py '44' (True,False) (1000,False,'44') ('window','intervals') 2 (False,False,True) (0.5,30,1,True) (3,'44') (1,0,0) ['VAP','BVAP'] ('none',0.5,True,False,'all',100,5000,True,0.8) (1,0)
 ```
-Here is a description of each variable in the above command:
+<!--Here is a description of each variable in the above command:
 - `grid_placement` is set to 'mixed' which means that it is a mixture of the 'random' `grid_placement` method and 'fixed' `grid_placement` method when constructing the countryside (mostly rural census blocks). 
 The '3' and '4' represent the length and width of the rectangle built using the 'fixed' method that will be constructed using samples of size `sample_num` respectively. The '5' represents the number of additional samples of census blocks added iteratively to the boundary of the rectangle using the 'random' method.
 - `sampling_method` is set to 'diam' for diameter.
@@ -369,10 +369,18 @@ The '3' and '4' represent the length and width of the rectangle built using the 
 - `mono_city_ur` is set to 0. That is, when building the citites, rural census blocks are allowed to contain rural census blocks. 
 - `mean_samples_per_state` is set to 1000. That is, the average number of samples that will be used to build the countryside is 1000. 
 - `city_placement` is set to 'random'. That is, each city will be randomly inserted into the countryside. 
-
+-->
 # Schelling Segregation Algorithm
 
-Insert discussion for this algorithm here. 
+The Schelling Segregation Algorithm (SSA) is an agent-based model created by Thomas Schelling, an American economist, in 1971. 
+As the name suggest, the goal was to construct a model that would resemble the movement of agent of different races on some surface. 
+Specifically, an agent will move to a random open location if they are not surrounded by at least 'ratio' agents similar to themselves. The 'ratio' is called the similarity threshold and the proportion of similar agents that are in the neighborhood of an agent is called the similarity ratio. 
+In the context of segregation, a person will move from their location to an open location randomly if they are not surrounded by at least 'ratio' people. 
+Unfortunately, SSA does not accurately model segregation since the model fails to account for economic difficulties, gentrification, and other external and internal forces.
+
+Despite these limitations, we have created a modification of the SSA similar to that proposed by Cottrell his unpublished [manuscript](http://www-personal.umich.edu/~dcott/pdfs/Chapter_1.pdf). Note that Cottrell was redistributing the vote whereas we are redistributing the urban vs. rural locations. The neighborhood of a particular grid location is based on 'nbr_dist' using the Chebyshev metric (all know as L-infinity metric). 
+The number of iterations by which the SSA is run is controlled by the variable 'iterations'. 
+Sometimes, if 'iterations' is not large enough or 'ratio' is not tuned properly, there are many isolated grid locations that primarily have urban census blocks. To resolve this, the program has the ability to delete these locations by setting `no_isolates==True`. 
 
 # Images 
 The files in images are examples of instances run by text_main.py. The description of each is recorded based on the same variables and order as listed above. 
