@@ -183,11 +183,11 @@ The population between 50K and 60K are labeled as 0 in `pop_category` and increa
 Another option is to set the variable to 'all' which indicates that all city sizes are possible in the creation of new cities. 
 - `city_specs`: tuple that will help determine the number of cities using various methods. 
 The possible values for the first coordinate are 0, 1, 2, and 3. The lengths of the tuple depends on the first coordinate. If the first coordinate is 0, 1, 2, or 3, then the length of the tuple is 2, 3, 2, 2 respectively. 
-If the first coordinate is 0, then the number of samples used to build a city is the value in the second coordinate of the `city_specs` tuple. 
-If the first coordinate is 1 and the tuple is (1,x,y), then x is a string that represents the 2-digit code for one of the possible states listed above in `state`, and y is an integer greater than or equal to 1000. The number of cities when the first coordinate is 1 is the number of cities in state x with a population over y people.
-If the first coordinate is 2 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. 
+  -If the first coordinate is 0, then the number of samples used to build a city is the value in the second coordinate of the `city_specs` tuple. 
+  -If the first coordinate is 1 and the tuple is (1,x,y), then x is a string that represents the 2-digit code for one of the possible states listed above in `state`, and y is an integer greater than or equal to 1000. The number of cities when the first coordinate is 1 is the number of cities in state x with a population over y people.
+  -If the first coordinate is 2 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. 
 The number of cities when the first coordinate is 2 is equal to the number of cities over a population of 5000 in state x. 
-If the first coordinate is 3 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. The number of cities when the first coordinate is 2 is equal to the number of cities over a population of 5000 in state x. The sizes of the cities will be the same sizes as those that appear in state x. 
+  -If the first coordinate is 3 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. The number of cities when the first coordinate is 2 is equal to the number of cities over a population of 5000 in state x. The sizes of the cities will be the same sizes as those that appear in state x. 
 - `mod`: string that represents the modification that is to be made on each sample.
 This modification would be to the edges between census blocks in the sample or the vertices (census blocks) themselves. 
 The options for modification are as follows: 'add_vert', 'add_edges', 'add_remove_edges', 'delete_vert', 'delete_edges', and 'none'.
