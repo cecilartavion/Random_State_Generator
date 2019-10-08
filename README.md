@@ -56,56 +56,10 @@ The output of the code will be a dual graph where each vertex is a census block,
 
 To run the code, change working directory to the file that contains "test_main.py". Then run the following command with the appropriate variables filled in (descriptions below):
 ```
-run test_main.py grid_placement sampling_method merge_method sample_num state pop_category city_specs mod mod_prob demo_cols sampling_parameters save_status interval_prob mono_rural_ur mono_city_ur mean_samples_per_state city_placement
+run random_state_generator.py state state_specs state_parameters sampling_merging_method sampling_parameter use_specs use_parameters city_specs noisy_parameters demo_cols support_parameters save_status
 ```
-Here is a description of each variable in the above script:
-- `grid_placement`: A tuple of length 2, 3, or 4. 
-The grid corresponds to how each sample of `sample_num` census blocks is placed in the countryside.
-The first element of each tuple describes the method used to build the countryside and possible the cities. 
-The method options are 'random', 'fixed', and 'mixed' and must be given as strings. 
-The remaining elements in each tuple are positive integers.  For the tuple lengths, the method corresponds to the length of the tuple. 
-That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixed', and 'mixed' respectively. 
-  - When the method is set to 'random', the first sample of census blocks is placed at grid location (0,0) (x,y coordinate locations). Then all of the subsequent samples are placed iteratively around what has been constructed so far for the grid. So for the second sample, the possible locations would be (0,1), (1,0), (-1,0), and (0,-1). 
-  - When `grid_placement` is set to ('fixed',m,n), a rectangular m by n grid is made using mn samples. The first sample is placed in location (0,0) and the rectangle is constructed with corners (0,0), (a-1,0), (b-1,0), and (a-1,b-1). 
-  - When `grid_placement` is set to ('mixed',m,n,p), a rectangular m by n grid is made using mn samples like when the method was 'fixed'. Then p additional samples of census blocks are added iteratively to the boundary of the rectangle using the 'random' method. In total, there will be mnp samples.
-- `sampling_method`: A string which represents how each sample is built. The options for this string are 'rect' and 'diam'. 
-  - For 'rect', a random census block is chosen (urban or rural depends which part of the code this variable is executed). 
-  Then a window is drawn around one census block. 
-  Then at each iteration, one side of the rectangular window is expanded by 0.1 degrees (between 6.8 and 7 miles in terms of distance in latitudinal and longitudinal directions). 
-  The window will stop growing once it reaches at least `sample_num` census blocks in the window. 
-  - For 'diam', a random census block, call it v, is chosen (urban or rural depends which part of the code this variable is executed).
-  Then the vertices distance 1 (graph theoretic distance) from v are added to the sample. 
-  If the number of vertices in this subgraph is less than `sample_num`, then add all of the vertices distance 2 from v to the sample. 
-  Once there are at least `sample_num` vertices in the sample, vertices are deleted uniformly at random from the list of vertices furtherest away from v in our sample until only `sample_num` vertices remain. 
-- `merge_method`: A string which represents how a sample is added to a grid of already merged samples. The options for this string are 'intervals' and 'intersect'. 
-  - For 'intervals', the maximum and minimum values in the x- and y-directions are found. 
-  The geometric boundary recorded in the shapefile contains a list of points that dictact the boundary of each census block. 
-  Using these points, the the boundary that creates a sample is used to construct a list of the points on the boundary of the sample. 
-  These points are ordered and the positive of the maximum and minimum values in the x- and y-directions are recorded. 
-  Then the median point between each pair of successive maximum and minimum values in the list of ordered boundary points are found and recorded as the "four corners of a rectangle". 
-  In this way, a pseudo-rectangular boundary region is constructed for the sample.
-  After the "four corners of a rectangle" representing the boundary of the sample are recorded, the proportion and order of the census blocks that occupy each side of the rectangle are recorded using interval notation.
-  For example, say a sample of census blocks has 6 census blocks that occupy the "right side of the boundary rectangle" on the intervals [0,0.15], [0.15,0.3], [0.3,0.41], [0.41,0.45], [0.45,0.8], [0.8,1.0].
-  When a sample is joined to another sample, the intervals are matched so that edges are added between census blocks that have overlapping invervals. 
-  For example, a second sample of census blocks has 8 census blocks that occupy the "left side of the boundary rectangle" on intervals [0,0.1], [0.1,0.25], [0.25,0.28], [0.28,0.31], [0.31,0.5], [0.5,0.66], [0.66,0.81],[0.81,1.0]. 
-  Now suppose that the previous to samples are going to be joined together. 
-  Then there will be an edge between the census blocks with the following pairs of intervals: {[0,0.15],[0,0.1]}, {[0,0.15],[0.1,0.25]}, {[0.15,0.3],[0.1,0.25]}, {[0.15,0.3],[0.25,0.28]}, {[0.15,0.3],[0.28,0.31]}, {[0.3,0.41],[0.31,0.5]}, {[0.41,0.45],[0.31,0.5]}, {[0.45,0.8], [0.31,0.5]}, {[0.45,0.8],[0.5,0.66]}, {[0.45,0.8],[0.66,0.81]}, {[0.8,1.0],[0.66,0.81]}, {[0.8,1.0],[0.81,1.0]}.
-  - For 'intersect', a bounding rectangle has been placed around the sample of census block centroids. 
-  For each census block, say v, inside the bounding rectangle that is adjacent to a census block, say u, outside of the bounding rectangle, the intersection point of the edge and the bounding rectangle is recorded.
-  The order of the intersection points between each edge pair, {u,v}, and the bounding rectangle for each side of the bounding rectangle are recorded. 
-  Then we will have an order to the adjacencies between that will be made between two samples. 
-  For example, suppose that sample A has 6 census blocks (call them c_1, c_2, c_3, c_4, c_5, and c_6) inside the bounding rectangle that have 12 intersection points on the right side of the bounding rectangle of sample A which are ordered from top to bottom as follows: c_1, c_2, c_1, c_1, c_3, c_3, c_4, c_4, c_5, c_4, c_6, c_6. 
-  Also, suppose that sample B has 8 census blocks (call them d_1, d_2,...,d_8) inside the bounding rectangle that have 10 intersection points on the left side of the bounding rectangle of sample B which are ordered from top to bottom as follows:
-  d_1, d_2, d_2, d_3, d_4, d_5, d_6, d_7, d_7, d_8. 
-  Then a random number between 10 and 12, inclusive, is chosen (say 11) which will be the target number of edges to join between the right side of sample A and left side of sample B.
-  For sample A, one edge will be randomly chosen not to be include, say c_2 is not included in the intersection point list. 
-  Now, sample B will have one intersection point added to the list of possible intersection points, say an extra d_7 is added, and it will be placed close to one of the already existing intersection points, say our new ordering of 11 intersection points are d_1, d_2, d_2, d_3, d_4, d_5, d_6, d_7, d_7, d_7, d_8. 
-  Then join the vertices of the centroids of census blocks according to the order we found above. 
-  That is, add the following edges to the graph so that the resulting graph is connected: {c_1,c_1}, {c_1,d_2}, {c_1,d_2}, {c_3,d_3}, {c_3,d_4}, {c_4,d_5}, {c_5,d_6}, {c_4,d_7}, {c_4,d_7}, {c_6,d_7}, {c_6,d_8}. 
-  WARNING: It is possible that by doing this merging method, the resulting graph may not be planar. 
-- `sample_num`: two digit string that represents the approximate number of census blocks in each sample taken. 
-- `state`: two digit number that represents the U.S. from which data is sampled. 
-The possible two-digit value and their corresponding states are 
+- `state`: either the string 'random' or a two digit string that represents the U.S. from which data is sampled. 
+The possible two-digit values and their corresponding states are as follows:
 01 -- Alabama, 
 04 -- Arizona, 
 05 -- Arkansas, 
@@ -155,6 +109,53 @@ The possible two-digit value and their corresponding states are
 55 -- Wisconsin,
 56 -- Wyoming.
 Both Alaska and Hawaii are not included because of contiguity complications.
+
+Here is a description of each variable in the above script:
+- `grid_placement`: A tuple of length 2, 3, or 4. 
+The grid corresponds to how each sample of `sample_num` census blocks is placed in the countryside.
+The first element of each tuple describes the method used to build the countryside and possible the cities. 
+The method options are 'random', 'fixed', and 'mixed' and must be given as strings. 
+The remaining elements in each tuple are positive integers.  For the tuple lengths, the method corresponds to the length of the tuple. 
+That is, the length 2, 3, and 4 tuples have the first element as 'random', 'fixed', and 'mixed' respectively. 
+  - When the method is set to 'random', the first sample of census blocks is placed at grid location (0,0) (x,y coordinate locations). Then all of the subsequent samples are placed iteratively around what has been constructed so far for the grid. So for the second sample, the possible locations would be (0,1), (1,0), (-1,0), and (0,-1). 
+  - When `grid_placement` is set to ('fixed',m,n), a rectangular m by n grid is made using mn samples. The first sample is placed in location (0,0) and the rectangle is constructed with corners (0,0), (a-1,0), (b-1,0), and (a-1,b-1). 
+  - When `grid_placement` is set to ('mixed',m,n,p), a rectangular m by n grid is made using mn samples like when the method was 'fixed'. Then p additional samples of census blocks are added iteratively to the boundary of the rectangle using the 'random' method. In total, there will be mnp samples.
+- `sampling_method`: A string which represents how each sample is built. The options for this string are 'rect' and 'diam'. 
+  - For 'rect', a random census block is chosen (urban or rural depends which part of the code this variable is executed). 
+  Then a window is drawn around one census block. 
+  Then at each iteration, one side of the rectangular window is expanded by 0.1 degrees (between 6.8 and 7 miles in terms of distance in latitudinal and longitudinal directions). 
+  The window will stop growing once it reaches at least `sample_num` census blocks in the window. 
+  - For 'diam', a random census block, call it v, is chosen (urban or rural depends which part of the code this variable is executed).
+  Then the vertices distance 1 (graph theoretic distance) from v are added to the sample. 
+  If the number of vertices in this subgraph is less than `sample_num`, then add all of the vertices distance 2 from v to the sample. 
+  Once there are at least `sample_num` vertices in the sample, vertices are deleted uniformly at random from the list of vertices furtherest away from v in our sample until only `sample_num` vertices remain. 
+- `merge_method`: A string which represents how a sample is added to a grid of already merged samples. The options for this string are 'intervals' and 'intersect'. 
+  - For 'intervals', the maximum and minimum values in the x- and y-directions are found. 
+  The geometric boundary recorded in the shapefile contains a list of points that dictact the boundary of each census block. 
+  Using these points, the the boundary that creates a sample is used to construct a list of the points on the boundary of the sample. 
+  These points are ordered and the positive of the maximum and minimum values in the x- and y-directions are recorded. 
+  Then the median point between each pair of successive maximum and minimum values in the list of ordered boundary points are found and recorded as the "four corners of a rectangle". 
+  In this way, a pseudo-rectangular boundary region is constructed for the sample.
+  After the "four corners of a rectangle" representing the boundary of the sample are recorded, the proportion and order of the census blocks that occupy each side of the rectangle are recorded using interval notation.
+  For example, say a sample of census blocks has 6 census blocks that occupy the "right side of the boundary rectangle" on the intervals [0,0.15], [0.15,0.3], [0.3,0.41], [0.41,0.45], [0.45,0.8], [0.8,1.0].
+  When a sample is joined to another sample, the intervals are matched so that edges are added between census blocks that have overlapping invervals. 
+  For example, a second sample of census blocks has 8 census blocks that occupy the "left side of the boundary rectangle" on intervals [0,0.1], [0.1,0.25], [0.25,0.28], [0.28,0.31], [0.31,0.5], [0.5,0.66], [0.66,0.81],[0.81,1.0]. 
+  Now suppose that the previous to samples are going to be joined together. 
+  Then there will be an edge between the census blocks with the following pairs of intervals: {[0,0.15],[0,0.1]}, {[0,0.15],[0.1,0.25]}, {[0.15,0.3],[0.1,0.25]}, {[0.15,0.3],[0.25,0.28]}, {[0.15,0.3],[0.28,0.31]}, {[0.3,0.41],[0.31,0.5]}, {[0.41,0.45],[0.31,0.5]}, {[0.45,0.8], [0.31,0.5]}, {[0.45,0.8],[0.5,0.66]}, {[0.45,0.8],[0.66,0.81]}, {[0.8,1.0],[0.66,0.81]}, {[0.8,1.0],[0.81,1.0]}.
+  - For 'intersect', a bounding rectangle has been placed around the sample of census block centroids. 
+  For each census block, say v, inside the bounding rectangle that is adjacent to a census block, say u, outside of the bounding rectangle, the intersection point of the edge and the bounding rectangle is recorded.
+  The order of the intersection points between each edge pair, {u,v}, and the bounding rectangle for each side of the bounding rectangle are recorded. 
+  Then we will have an order to the adjacencies between that will be made between two samples. 
+  For example, suppose that sample A has 6 census blocks (call them c_1, c_2, c_3, c_4, c_5, and c_6) inside the bounding rectangle that have 12 intersection points on the right side of the bounding rectangle of sample A which are ordered from top to bottom as follows: c_1, c_2, c_1, c_1, c_3, c_3, c_4, c_4, c_5, c_4, c_6, c_6. 
+  Also, suppose that sample B has 8 census blocks (call them d_1, d_2,...,d_8) inside the bounding rectangle that have 10 intersection points on the left side of the bounding rectangle of sample B which are ordered from top to bottom as follows:
+  d_1, d_2, d_2, d_3, d_4, d_5, d_6, d_7, d_7, d_8. 
+  Then a random number between 10 and 12, inclusive, is chosen (say 11) which will be the target number of edges to join between the right side of sample A and left side of sample B.
+  For sample A, one edge will be randomly chosen not to be include, say c_2 is not included in the intersection point list. 
+  Now, sample B will have one intersection point added to the list of possible intersection points, say an extra d_7 is added, and it will be placed close to one of the already existing intersection points, say our new ordering of 11 intersection points are d_1, d_2, d_2, d_3, d_4, d_5, d_6, d_7, d_7, d_7, d_8. 
+  Then join the vertices of the centroids of census blocks according to the order we found above. 
+  That is, add the following edges to the graph so that the resulting graph is connected: {c_1,c_1}, {c_1,d_2}, {c_1,d_2}, {c_3,d_3}, {c_3,d_4}, {c_4,d_5}, {c_5,d_6}, {c_4,d_7}, {c_4,d_7}, {c_6,d_7}, {c_6,d_8}. 
+  WARNING: It is possible that by doing this merging method, the resulting graph may not be planar. 
+- `sample_num`: two digit string that represents the approximate number of census blocks in each sample taken. 
 - `pop_category`: integer or string. The only string accepted is 'all'. The intergers allowed are from 0 to the length of the population division. The population is currently divided into cities with 
 less than 50,000 people (0), 
 between 50,000 and 60,000 people (1),
