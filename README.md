@@ -255,7 +255,7 @@ The three elements of `use_specs` represent the variables 'use_cities', 'use_bot
 		- The 'min_u_cbs' variable is a non-negative integer. 
 		While placing the individual grid locations (not the cities), 'min_u_cbs' represents the minimum allowed number of urban census blocks in a grid location when trying to detect how many census blocks are in a grid location.
 	- Suppose that `use_specs==(False,False,True)`. 
-	Then `use_parameters` is a tuple of length 4 where the elements of the tuple represent the variables 'ratio', 'iterations', 'nbr_dist', and 'no_isolates'. See the section below on the Schelling Segregation Algorithm for a description of these variables.
+	Then `use_parameters` is a tuple of length 4 where the elements of the tuple represent the variables 'ratio', 'iterations', 'nbr_dist','no_isolates', and 'metric'. See the section below on the Schelling Segregation Algorithm for a description of these variables.
 - `city_specs`: This argument is a tuple that will help determine the number of cities using various methods. 
 The possible values for the first coordinate are 0, 1, 2, and 3. The lengths of the tuple depends on the first coordinate. If the first coordinate is 0, 1, 2, or 3, then the length of the tuple is 2, 3, 2, 2 respectively. 
   -If the first coordinate is 0, then the number of samples used to build a city is the value in the second coordinate of the `city_specs` tuple. 
@@ -348,7 +348,7 @@ If the second coordinate is 1, a json file of the graph with the data will be sa
 
 An example of a fully filled out command to run in the terminal would be the following:
 ```
-run random_state_generator.py '44' (True,False) (1000,False,'44') ('window','intervals') 2 (False,False,True) (0.5,30,1,True) (3,'44') (1,0,0) ['VAP','BVAP'] ('none',0.5,True,False,'all',100,5000,True,0.8) (1,0)
+run random_state_generator.py '44' (True,False) (1000,False,'44') ('window','intervals') 2 (False,False,True) (0.5,30,1,True,'cityblock') (3,'44') (1,0,0) ['VAP','BVAP'] ('none',0.5,True,False,'all',100,5000,True,0.8) (1,0)
 ```
 <!--Here is a description of each variable in the above command:
 - `grid_placement` is set to 'mixed' which means that it is a mixture of the 'random' `grid_placement` method and 'fixed' `grid_placement` method when constructing the countryside (mostly rural census blocks). 
@@ -378,7 +378,9 @@ Specifically, an agent will move to a random open location if they are not surro
 In the context of segregation, a person will move from their location to an open location randomly if they are not surrounded by at least 'ratio' people. 
 Unfortunately, SSA does not accurately model segregation since the model fails to account for economic difficulties, gentrification, and other external and internal forces.
 
-Despite these limitations, we have created a modification of the SSA similar to that proposed by Cottrell his unpublished [manuscript](http://www-personal.umich.edu/~dcott/pdfs/Chapter_1.pdf). Note that Cottrell was redistributing the vote whereas we are redistributing the urban vs. rural locations. The neighborhood of a particular grid location is based on 'nbr_dist' using the Chebyshev metric (all know as L-infinity metric). 
+Despite these limitations, we have created a modification of the SSA similar to that proposed by Cottrell his unpublished [manuscript](http://www-personal.umich.edu/~dcott/pdfs/Chapter_1.pdf). Note that Cottrell was redistributing the vote whereas we are redistributing the urban vs. rural locations. 
+The neighborhood of a particular grid location is based on 'nbr_dist' using the distance metric specified by 'metric. 
+Two of the most successful metrics in practice for our geometry have been Chebyshev metric (also know as L-infinity metric) and the city block metric (also known as the Manhatten metric). The possible metrics can be found on the [scipy documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html). The possible metrics are as follows: 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'wminkowski', 'yule'.
 The number of iterations by which the SSA is run is controlled by the variable 'iterations'. 
 Sometimes, if 'iterations' is not large enough or 'ratio' is not tuned properly, there are many isolated grid locations that primarily have urban census blocks. To resolve this, the program has the ability to delete these locations by setting `no_isolates==True`. 
 
