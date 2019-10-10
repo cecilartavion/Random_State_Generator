@@ -383,6 +383,18 @@ The neighborhood of a particular grid location is based on 'nbr_dist' using the 
 Two of the most successful metrics in practice for our geometry have been Chebyshev metric (also know as L-infinity metric) and the city block metric (also known as the Manhatten metric). The possible metrics can be found on the [scipy documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html). The possible metrics are as follows: 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'wminkowski', 'yule'.
 The number of iterations by which the SSA is run is controlled by the variable 'iterations'. 
 Sometimes, if 'iterations' is not large enough or 'ratio' is not tuned properly, there are many isolated grid locations that primarily have urban census blocks. To resolve this, the program has the ability to delete these locations by setting `no_isolates==True`. 
+The last variable that can be chanced is the 'fixed_urban_gl", that is, the variable that can fix the number of grid locations that primarily have urban census blocks. 
+
+To clarify all of the variables, the `use_parameter` argument takes six elements when `use_ssa=True`. In this case, we have the following variables in order:
+- The first element of `use_parameters` is 'ratio'. This variable is a number between 0 and 1, and determines the proportion of neighbors that need to be simiar to a particular urban grid location in order for the grid location not to change.
+- The second element of `use_parameters` is 'iterations'. This integer variable is the number of iterations the Schelling Segregation Algorithm will perform before stopping. 
+- The third element of `use_parameters` is 'nbr_dist'. This float variable is the positive number that indicates any vertex as being a neighbor if the distance between a designated vertex and another vertex is less than 'nbr_dist'. 
+- The fourth element of `use_parameters` is 'no_isolates'. This boolean varaible indicates whether isolated grid locations are deleted. That is, if `no_isolates==True`, then all urban grid locations that are not adjacent to another urban grid location are deleted from the list of urban grid locations.
+- The fifth element of `use_parameters` is 'metric'. This string variable represents how distance is calculated between two verices. 
+- The sixth element of `use_parameters` is 'fixed_urban_gl'. This string or integer variable represents the number of urban grid locations that will be used in the Schelling Segregation Algorithm. If `fixed_urban_gl==None`, then the number of urban grid locations is based on the number of urban grid locations in the original state, but also depends on the value of 'sampling_method' and 'state_shape'. 
+If 'fixed_urban_gl' is a positive integer, then 'fixed_urban_gl' is the number of urban grid locations used in the Schelling Segregation Algorithm. 
+It is particularly useful to set the value for 'fixed_urban_gl' when `no_isolates==True` since otherwise the number of urban grid locations is not necessarily going to be the number of urban grid locations intended. 
+
 
 # Images 
 The files in images are examples of instances run by text_main.py. The description of each is recorded based on the same variables and order as listed above. 
