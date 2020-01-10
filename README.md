@@ -9,7 +9,21 @@ Once each rural grid location is constructed, the program will move on to constr
 The method used to construct the urban grid locations is as follows. Note that this method is the same as the one used for building the rural grid locations. 
 The original dual graph of that is separated into grid locations and each grid location is classified as either rural or urban based on whether they had less or more than 50% urban census blocks respectively. 
 A uniformly random urban grid location is selected. In this grid location, a random urban census block is selected and a rectangular region is placed around the census block. 
-All census blocks in this region are going to be added to the the next grid location in the random state being generated. If there are rural census blocks in these regions, that is acceptable. However, for the rural grid locations, only rural census blocks are allowed. 
+All census blocks in this region are going to be added to the the next grid location in the random state being generated. If there are rural census blocks in these regions, that is acceptable. However, for the rural grid locations, only rural census blocks are allowed.
+
+Two grid locations are joined together in the random state using what we call the 'interval method' and is conducted as follows. 
+First, the maximum and minimum values in the x- and y-directions are found. 
+The geometric boundary recorded in the shapefile contains a list of points that dictact the boundary of each census block. 
+Using these points, the the boundary that creates a sample is used to construct a list of the points on the boundary of the sample. 
+These points are ordered and the positive of the maximum and minimum values in the x- and y-directions are recorded. 
+Then the median point between each pair of successive maximum and minimum values in the list of ordered boundary points are found and recorded as the "four corners of a rectangle". 
+In this way, a pseudo-rectangular boundary region is constructed for the sample. 
+After the "four corners of a rectangle" representing the boundary of the sample are recorded, the proportion and order of the census blocks that occupy each side of the rectangle are recorded using interval notation. 
+For example, say a sample of census blocks has 6 census blocks that occupy the "right side of the boundary rectangle" on the intervals [0,0.15], [0.15,0.3], [0.3,0.41], [0.41,0.45], [0.45,0.8], [0.8,1.0]. 
+When a sample is joined to another sample, the intervals are matched so that edges are added between census blocks that have overlapping invervals. 
+For example, a second sample of census blocks has 8 census blocks that occupy the "left side of the boundary rectangle" on intervals [0,0.1], [0.1,0.25], [0.25,0.28], [0.28,0.31], [0.31,0.5], [0.5,0.66], [0.66,0.81],[0.81,1.0]. 
+Now suppose that the previous to samples are going to be joined together. 
+Then there will be an edge between the census blocks with the following pairs of intervals: {[0,0.15],[0,0.1]}, {[0,0.15],[0.1,0.25]}, {[0.15,0.3],[0.1,0.25]}, {[0.15,0.3],[0.25,0.28]}, {[0.15,0.3],[0.28,0.31]}, {[0.3,0.41],[0.31,0.5]}, {[0.41,0.45],[0.31,0.5]}, {[0.45,0.8], [0.31,0.5]}, {[0.45,0.8],[0.5,0.66]}, {[0.45,0.8],[0.66,0.81]}, {[0.8,1.0],[0.66,0.81]}, {[0.8,1.0],[0.81,1.0]}.
 
 The urban grid locations will be determined by the use of the Schelling Segregation Algorithm. 
 
@@ -94,7 +108,7 @@ In this way, the high density regions (such as city centers and the downtown are
 - `interval_prob` is set to 0.8. The `interval_prob` is the mean used to determine the probability of whether an edge should be kept when placing edges between two grid locations (called the `interval` merge method).
 That is, a Gaussian random number between 0 and 1 with mean equal to 0.8 and standard deviation 0.1 is chosen as the probability, say p, that each edge identified between two grid locations is kept in the random state. 
 
-##Example
+## Variable Description
 
 Here is a description of each variable in the above script:
 - `state`: This argument is either the string 'random' or a two digit string that represents the U.S. from which data is sampled. 
@@ -161,9 +175,13 @@ The purpose of the 3rd element in the tuple will change depending on whether the
 - `use_parameters`: This argument is a tuple of length 6.
 	- `use_parameters` is a tuple of length 6 where the elements of the tuple represent the variables 'ratio', 'iterations', 'nbr_dist','no isolates', 'metric', and 'number of urban grid locations'. See the section below on the Schelling Segregation Algorithm for a description of these variables.
 
+## Example
+
 An example of a fully filled out command to run in the terminal would be the following:
 ```
-run random_state_generator.py '44' (True,False) (1000,False,'44') ('window','intervals') 2 (False,False,True) (0.5,30,1,True,'cityblock') (3,'44') (1,0,0) ['VAP','BVAP'] ('none',0.5,True,False,'all',100,5000,True,0.8) (1,0)
+run rsg_ver1.py '44' (1000,False) (0.5,30,1,True,'cityblock',None)
+
+run rsg_ver1.py '13' (11758,False) (0.30,40,2,False,'cityblock',1309)
 ```
 <!--Here is a description of each variable in the above command:
 - `grid_placement` is set to 'mixed' which means that it is a mixture of the 'random' `grid_placement` method and 'fixed' `grid_placement` method when constructing the countryside (mostly rural census blocks). 
