@@ -11,6 +11,8 @@ The original dual graph of that is separated into grid locations and each grid l
 A uniformly random urban grid location is selected. In this grid location, a random urban census block is selected and a rectangular region is placed around the census block. 
 All census blocks in this region are going to be added to the the next grid location in the random state being generated. If there are rural census blocks in these regions, that is acceptable. However, for the rural grid locations, only rural census blocks are allowed. 
 
+The urban grid locations will be determined by the use of the Schelling Segregation Algorithm. 
+
 ## Goal
 The purpose of this code is to produce randomly generated states built from the census blocks of 48 of the 50 U.S. states (Alaska and Hawaii are removed due to contiguity complications). 
 The output of the code will be a dual graph where each vertex is a census block, edges represent adjacent census blocks and each census block contains the following columns of information:
@@ -64,10 +66,23 @@ The output of the code will be a dual graph where each vertex is a census block,
 
 ## How To Run Code
 
-To run the code, change working directory to the file that contains "test_main.py". Then run the following command with the appropriate variables filled in (descriptions below):
+To run the code, change the working directory to the file that contains "rsg_ver1.py". Additionally, change the string for `shp_path` to your directory that contains all of the original shapefiles that can be downloaded from the Census Bureau. 
+The folder structure in the folder associated with the original shapefiles must be as indicated by the definition of `BK` in the rsg_ver1.py code. 
+Also, change the string for `json_cb_path` to point towards your directory that contains all the json shapefiles that were provided by Daryl DeFord at [daryldeford.com/dual_graphs]. 
+
+Credit for constructing the json files goes entirely toward Daryl DeFord. 
+Thank you, Daryl, for all your help acquiring the data and troubleshooting. I could not have built this program without your encouragement and expertise.
+
+Next, run the following command with the appropriate variables filled in (descriptions below):
 ```
-run random_state_generator.py state state_specs state_parameters sampling_merging_method sampling_parameter use_specs use_parameters city_specs noisy_parameters demo_cols support_parameters save_status
+run rsg_ver1.py state state_parameters use_parameters
 ```
+
+Note that several features in previous versions of this program have not become fixed attributes based on which attributes provided the best representation for a state. Below I list out those features that are now held constant:
+- The random seed is set at 42.
+- The Schelling Segregation Algorithm will always be used to determine where to place the urban grid locations. 
+- 
+
 Here is a description of each variable in the above script:
 - `state`: This argument is either the string 'random' or a two digit string that represents the U.S. from which data is sampled. 
 The possible two-digit values and their corresponding states are as follows:
@@ -120,14 +135,6 @@ The possible two-digit values and their corresponding states are as follows:
 55 -- Wisconsin,
 56 -- Wyoming.
 Both Alaska and Hawaii are not included because of contiguity complications.
-- `state_specs`: This argument is a tuple of length 2 with binary elements. Exactly one of the elements in the tuple must be True. 
-	- The 1st element in `state_specs` represents the variable 'state_shape'. 
-	In particular, if 'state_shape' is True, then the coordinates for the grid locations will form an approximate shape of a state based on the 'mean_samples_per_state' value. 
-	Note that when 'state_shape' is set to True, the 3rd element in `state_parameters` will indicate the state for which the program will approximate the shape of a state. 
-	That means the distributions of population can be applied to the particular shape of a different state, thus allowing for the ability to determine the effects of shape and distribution on the state. 
-	- The 2nd element in `state_specs` represents the variable 'build_state'. 
-	In particular, if 'build_state' is True, then the state will be built randomly according to the directions provided by the 3rd element in `state_parameters`. 
-	Again, note that the 3rd element in `state_parameters` will indicate directions for how to build the state.
 - `state_parameters`: This argument is a tuple of length 3. 
 The purpose of the 3rd element in the tuple will change depending on whether the 1st or 2nd element of `state_specs` is true. 
 	- The 1st element in `state_parameters` represents the variable 'mean_samples_per_state' which is a non-negative integer. 
