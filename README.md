@@ -5,13 +5,11 @@ The idea behind the construction is as follows. First, grid locations are constr
 Each grid location contains some number of census blocks depending on the arguments set by the user. 
 Then each grid location is merged to the countryside by some type of merge procedure (called `merge_method` in program). 
 
-Once the entire countryside is constructed, the program will move on to constructing the urban landscape. 
-There are three primary method in which the urban landscape is constructed. 
-First, only cities will be constructed similar to how the countryside was constructed, and then each city will be stitched into the countryside one at a time. 
-Second, cities will be constructed as above. 
-However, once all of the cities have been placed, the program will add individual grid locations that primarily contain urban census blocks. 
-Third, only individual grid locations that primarily contain urban census blocks are added to the countryside. 
-The quantity of the cities and the individual grid locations is determined by the user. 
+Once each rural grid location is constructed, the program will move on to constructing the urban grid locations. 
+The method used to construct the urban grid locations is as follows. Note that this method is the same as the one used for building the rural grid locations. 
+The original dual graph of that is separated into grid locations and each grid location is classified as either rural or urban based on whether they had less or more than 50% urban census blocks respectively. 
+A uniformly random urban grid location is selected. In this grid location, a random urban census block is selected and a rectangular region is placed around the census block. 
+All census blocks in this region are going to be added to the the next grid location in the random state being generated. If there are rural census blocks in these regions, that is acceptable. However, for the rural grid locations, only rural census blocks are allowed. 
 
 ## Goal
 The purpose of this code is to produce randomly generated states built from the census blocks of 48 of the 50 U.S. states (Alaska and Hawaii are removed due to contiguity complications). 
