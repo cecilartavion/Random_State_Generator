@@ -81,7 +81,20 @@ run rsg_ver1.py state state_parameters use_parameters
 Note that several features in previous versions of this program have not become fixed attributes based on which attributes provided the best representation for a state. Below I list out those features that are now held constant:
 - The random seed is set at 42.
 - The Schelling Segregation Algorithm will always be used to determine where to place the urban grid locations. 
-- 
+- The window sampling method will be used when selecting a random grid location. Further, both `gridloc_with_rural` and `gridloc_with_urban` will be used when building the random grid locations. 
+That is, instead of simply choosing a rectangular region around a uniformly randomly selected urban census block from the original state dual graph, we divided up the entire state into grid locations, identified the rural and urban grid locations, uniformly randomly selected a rural grid location or urban grid location (depending on which one is being added to the random state, a uniformly random rural or urban census block is chosen for the selected grid location respectively, and all census blocks in the rectangular region around this randomly selected census block constitute the new grid location that will be added to the random state.
+In this way, the high density regions (such as city centers and the downtown area) are not over represented in the random state. 
+- The shape of the random state will be the same as the state that is being sampled.
+- The merge method (manner in which two grid locations are joined) will be the interval method.
+- The sampling method will be the window method. That is, a fixed rectangle will be placed over the random grid location selected to generate a random grid location that will be added to the random state.
+- The variable `min_gridloc_size` will be set to 2. That is, The minimum number of census blocks in a grid location is 2.
+- The population will be the only parameter that has Gaussian noise added.
+- No modification will be made to each grid location.
+- Instead of determining the number of cities to be placed in the random state, this is all handled by the Schelling Segregation Algorithm.
+- `interval_prob` is set to 0.8. The `interval_prob` is the mean used to determine the probability of whether an edge should be kept when placing edges between two grid locations (called the `interval` merge method).
+That is, a Gaussian random number between 0 and 1 with mean equal to 0.8 and standard deviation 0.1 is chosen as the probability, say p, that each edge identified between two grid locations is kept in the random state. 
+
+##Example
 
 Here is a description of each variable in the above script:
 - `state`: This argument is either the string 'random' or a two digit string that represents the U.S. from which data is sampled. 
@@ -138,218 +151,15 @@ Both Alaska and Hawaii are not included because of contiguity complications.
 - `state_parameters`: This argument is a tuple of length 3. 
 The purpose of the 3rd element in the tuple will change depending on whether the 1st or 2nd element of `state_specs` is true. 
 	- The 1st element in `state_parameters` represents the variable 'mean_samples_per_state' which is a non-negative integer. 
-	In particular, 'mean_samples_per_state' represents the average number of grid locations desired by the user. A grid location is a small piece of the state that contains some positive number of census blocks. 
-	An acceptable number of grid locations depends on the population of the state, the `sampling_parameter` when `sampling_method=='diam' or sampling_method=='rect'`, and on whether 'mimic_city' (8th element of `support_parameters`) is True or False. 
-	A value of 'mean_samples_per_state' that is too large will mean that each grid location contains one census block, which will make the state look incredibly sparse when `sampling_method=='window'` and incredibly dense when `sampling_method=='diam' or sampling_method=='rect'`. 
-	A value of 'mean_samples_per_state' that is too small will have the opposite effect. 
-	The actual number of grid locations (called 'samples_per_state') is set by finding a random number using a normal distribution with mean equal to 'mean_samples_per_state' and with standard deviation equal to the standard deviation of the population over all of the census blocks in the original state.
-	If `mimic_city==True`, then the number of census blocks per grid location will mimic the city by setting the number of census blocks per grid location to (sum of total population)/((samples_per_state)(average state population per census block)). 
+	In particular, `mean_samples_per_state` represents the average number of grid locations desired by the user. A grid location is a small piece of the state that contains some positive number of census blocks. 
+	An acceptable number of grid locations depends on the population and density of the state per census block.
+	A value of `mean_samples_per_state` that is too large will mean that each grid location contains one census block, which will make the state look incredibly sparse.
+	A value of `mean_samples_per_state` that is too small will have the opposite effect. 
+	The actual number of grid locations (called `samples_per_state`) is set by finding a random number using a normal distribution with mean equal to `mean_samples_per_state` and with standard deviation equal to the standard deviation of the population over all of the census blocks in the original state.
 	- The 2nd element in `state_parameters` represents the variable 'water' which is a boolean variable. 
-	If `water==True`, then all census blocks that contain only water (no land) will be deleted from the possible set of census blocks that can be chosen during the construction of the state.
-	- The 3rd element in `state_parameters` represents either a state (possibly not the same as `state`) when `state_shape==True` or a variable called 'grid_placement' (a tuple of length 2, 3, or 4) when `build_state==True`. 
-		- If `state_shape==True`, then the 3rd element in `state_parameters` represents a state (call this variable 'state2') that may or may not be the same as that specified in the `state` argument. 
-		The value for 'state2' will follow the same restrictions as specified for `state`. 
-		The value for 'state2' will indicate for which state will the approximate shape of the state resemble. For example, if `state=='44'` and `state2=='47'`, then all census blocks, census block adjacency information, and census block data will come from Rhode Island (state FIPS code 44), and the overall shape of the state will come from Tennessee (state FIPS code 47). 
-		- If `build_state==True`, then the 3rd element in `state_parameters` represents the variable 'grid_placement' which is a tuple of length 2, 3, or 4.
-		The grid locations depend on the 1st element of 'grid_placement'. The first element of 'grid_placement' is always a string and the remaining elements are positive integers. 
-		The possible values for the first element of 'grid_placement' are as follows: 'random', 'fixed', and 'mixed'.
-		The first element of 'grid_placement' describes the method used to build the overall shape of the countryside and possibly the overall shape of the cities as well (depending on the value of `use_specs`). 
-		The length of the tuple 'grid_placement' is 2, 3, or 4 if the first element of 'grid_placement' is 'random', 'fixed', or 'mixed' respectively. 
-		In what follows, I describe the function of 'random', 'fixed', and 'mixed' as well as the remaining elements of the tuple 'grid_placement.
-			- When the 1st element of 'grid_placement' is 'random', the first grid location of census blocks is placed at (0,0) (using Cartesian coordinate system, that is, x,y coordinate locations). 
-			Then all of the subsequent samples are placed iteratively at adjacent integer coordinates so that each new grid location is 1 away (in either the x- or y-direction) from another grid location already placed. 
-			So for example, the second grid location has option of being placed at (0,1), (1,0), (-1,0), or (0,-1). 
-			As the name suggest, the second grid location is randomly choosen from among these 4 options. 
-			- When the 2nd element of 'grid_placement' is 'fixed', let ('fixed',m,n) be a generic representation of 'grid_placement' tuple. 
-			Then the grid locations will form a rectangular m by n grid using mn grid locations. 
-			The first sample is placed in location (0,0) and the rectangle is constructed with corners (0,0), (m-1,0), (n-1,0), and (m-1,n-1). 
-			- When the 1st element of 'grid_placement' is 'mixed', let ('mixed',m,n,p) be a generic representation of the 'grid_placement' tuple.  
-			Then the grid locations with form a rectangular m by n grid using mn samples as when the 1st element of 'grid_placement' was 'fixed'. Then p additional grid locations are added to the m by n rectangle iteratively as when the 1st element of 'grid_placement' was set to 'random'. In total, there will be mnp samples.
-- `sampling_merging_method`: This argument is a tuple of length 2 where each element is a string. The 1st element represents the variable `sampling_method` and the 2nd element represents `merge_method`. 
-	- `sampling_method`: This element is a string which represents how each sample is built. The options for this string are 'rect', 'diam', and 'window'. 
-		- For 'rect', a random census block is chosen (urban or rural depends which part of the code this variable is executed). 
-		Then a window is drawn around one census block. 
-		Then at each iteration, one side of the rectangular window is expanded by 0.1 degrees (between 6.8 and 7 miles in terms of distance in latitudinal and longitudinal directions). 
-		The window will stop growing once it reaches at least `sample_num` census blocks in the window. 
-		- For 'diam', a random census block, call it v, is chosen (urban or rural depends which part of the code this variable is executed).
-		Then the vertices distance 1 (graph theoretic distance) from v are added to the sample. 
-		If the number of vertices in this subgraph is less than `sample_num`, then add all of the vertices distance 2 from v to the sample. 
-		Once there are at least `sample_num` vertices in the sample, vertices are deleted uniformly at random from the list of vertices furtherest away from v in our sample until only `sample_num` vertices remain. 
-		- For 'window', a width and height is calculated for a region around the centroid of a census block. 
-		This window represents the size of the grid location when a census blocks are placed into any grid location to form a new state. 
-		A sample of census blocks is found by uniformly randomly selecting one census block from the original state. 
-		As long as there are at least 'min_gridloc_size' (the value for `sampling_parameter`) census blocks in the window, this window is inserted into a grid location on the overall state based on either the 'grid_placement' variable or the shape of the state found by setting `state_shape==True`. 
-	- `merge_method`: This element is a string which represents how a sample is added to a grid of already merged samples. The options for this string are 'intervals' and 'intersect'. 
-		- For 'intervals', the procedure for joining a single grid location to one or more grid locations is as follows. First, the maximum and minimum values in the x- and y-directions are found. 
-		The geometric boundary recorded in the shapefile contains a list of points that dictact the boundary of each census block. 
-		Using these points, the the boundary that creates a sample is used to construct a list of the points on the boundary of the sample. 
-		These points are ordered and the positive of the maximum and minimum values in the x- and y-directions are recorded. 
-		Then the median point between each pair of successive maximum and minimum values in the list of ordered boundary points are found and recorded as the "four corners of a rectangle". 
-		In this way, a pseudo-rectangular boundary region is constructed for the sample.
-		After the "four corners of a rectangle" representing the boundary of the sample are recorded, the proportion and order of the census blocks that occupy each side of the rectangle are recorded using interval notation.
-		For example, say a sample of census blocks has 6 census blocks that occupy the "right side of the boundary rectangle" on the intervals [0,0.15], [0.15,0.3], [0.3,0.41], [0.41,0.45], [0.45,0.8], [0.8,1.0].
-		When a sample is joined to another sample, the intervals are matched so that edges are added between census blocks that have overlapping invervals. 
-		For example, a second sample of census blocks has 8 census blocks that occupy the "left side of the boundary rectangle" on intervals [0,0.1], [0.1,0.25], [0.25,0.28], [0.28,0.31], [0.31,0.5], [0.5,0.66], [0.66,0.81],[0.81,1.0]. 
-		Now suppose that the previous to samples are going to be joined together. 
-		Then there will be an edge between the census blocks with the following pairs of intervals: {[0,0.15],[0,0.1]}, {[0,0.15],[0.1,0.25]}, {[0.15,0.3],[0.1,0.25]}, {[0.15,0.3],[0.25,0.28]}, {[0.15,0.3],[0.28,0.31]}, {[0.3,0.41],[0.31,0.5]}, {[0.41,0.45],[0.31,0.5]}, {[0.45,0.8], [0.31,0.5]}, {[0.45,0.8],[0.5,0.66]}, {[0.45,0.8],[0.66,0.81]}, {[0.8,1.0],[0.66,0.81]}, {[0.8,1.0],[0.81,1.0]}.
-		- For 'intersect', the procedure for joining a single grid location to one or more grid locations is as follows.
-		First, a bounding rectangle has been placed around the sample of census block centroids. 
-		For each census block, say v, inside the bounding rectangle that is adjacent to a census block, say u, outside of the bounding rectangle, the intersection point of the edge and the bounding rectangle is recorded.
-		The order of the intersection points between each edge pair, {u,v}, and the bounding rectangle for each side of the bounding rectangle are recorded. 
-		Then we will have an order to the adjacencies between that will be made between two samples. 
-		For example, suppose that sample A has 6 census blocks (call them c_1, c_2, c_3, c_4, c_5, and c_6) inside the bounding rectangle that have 12 intersection points on the right side of the bounding rectangle of sample A which are ordered from top to bottom as follows: c_1, c_2, c_1, c_1, c_3, c_3, c_4, c_4, c_5, c_4, c_6, c_6. 
-		Also, suppose that sample B has 8 census blocks (call them d_1, d_2,...,d_8) inside the bounding rectangle that have 10 intersection points on the left side of the bounding rectangle of sample B which are ordered from top to bottom as follows:
-		d_1, d_2, d_2, d_3, d_4, d_5, d_6, d_7, d_7, d_8. 
-		Then a random number between 10 and 12, inclusive, is chosen (say 11) which will be the target number of edges to join between the right side of sample A and left side of sample B.
-		For sample A, one edge will be randomly chosen not to be include, say c_2 is not included in the intersection point list. 
-		Now, sample B will have one intersection point added to the list of possible intersection points, say an extra d_7 is added, and it will be placed close to one of the already existing intersection points, say our new ordering of 11 intersection points are d_1, d_2, d_2, d_3, d_4, d_5, d_6, d_7, d_7, d_7, d_8. 
-		Then join the vertices of the centroids of census blocks according to the order we found above. 
-		That is, add the following edges to the graph so that the resulting graph is connected: {c_1,c_1}, {c_1,d_2}, {c_1,d_2}, {c_3,d_3}, {c_3,d_4}, {c_4,d_5}, {c_5,d_6}, {c_4,d_7}, {c_4,d_7}, {c_6,d_7}, {c_6,d_8}. 
-		WARNING: It is possible that by doing this merging method, the resulting graph may not be planar. 
-- `sampling_parameter`: This argument is an integer, but its function depends on whether `sampling_method=='window'` or `sampling_method=='rect' or sampling_method=='rect'`. 
-	- If `sampling_method=='window'`, then `sampling_parameter` represents the variable 'min_gridloc_size'. 
-	This variable must be a positive integer. 
-	'min_grid_size' represents the minimum allowable number of census blocks in a grid location when building a sample of census blocks using the 'window' method.
-	- If `sampling_method=='rect' or sampling_method=='rect'`, then `sampling_parameter` represents the variable 'sample_num'. 
-	This variable must be a positive integer. 
-	'sample_num' represents the minimum number of census blocks allowed in a grid location when building a sample of census blocks using the 'diam' or 'rect' methods. 
-	Note that it is possible that 'sample_num' may be overwritten if `mimic_city==True`. 
-- `use_specs`: This argument is a tuple of length 3 where each element is boolean. At least one and at most three elements in `use_specs` must be True. 
-If the third element of `use_specs` is True, then the first two elements must be False. 
-Note that when the second element is True, the first element being True or False has no impact on the outcome of the new state. 
-The three elements of `use_specs` represent the variables 'use_cities', 'use_both_cities_and_urban', and 'use_ssa'. 
-	- Suppose that only 'use_cities' is True in `use_specs`. 
-	Then once the countryside is completed, only cities will be built. The cities will be built according the 'city_placement' variable in `use_parameters`. 
-	- Suppose that only 'use_both_cities_and_urban' is True in `use_specs`. Then once the countryside is completed, cities will be built according the 'city_placement' variable in `use_parameters`. 
-	After the cities are built, the difference between the number of urban grid locations in the current state and the original state will be the number of individual grid locations that primarily contain urban census blocks will be added to the countryside. 
-	The manner in which these individual grid locations are added depends on 'city_placement' variable. 
-	- Suppose that only 'use_ssa' is True in `use_specs`. Then only individual grid locations will be added to the countryside iteratively. 
-	The coordinates of the individual grid locations is fixed and determined by running a modified version of the  Schelling Segregation Algorithm. For an indepth explanation of this algorithm, see the discussion in a section below. 
-	The manner in which these individual grid locations are added depends the `use_parameters`. 
-- `use_parameters`: This argument is a tuple of length either 4 or 5 depending on whether one of the first two elements in `use_specs` is True or not respectively. 
-	- Suppose that `use_specs==(True,False,False)`, `use_specs==(True,True,False)` or `use_specs==(False,True,False)`. 
-	Then `use_parameters` is a tuple of length 5 where the elements of the tuple represent the variables 'city_placement', 'mute_factor', 'silence_factor', 'rand_city_locs', and 'min_u_cbs'. 
-		- 'city_placement' is a variable that is either a tuple of length 4 or a string. All of the different options for `city_placement` will affect the distribution of where to place the next city in the countryside. 
-		That is, a probability distribution will be placed at each grid location and when it is time to place the city in the countryside, a grid location will be randomly selected based on this probability distribution. 
-			-If `city_placement` is a tuple, the first element must be 'neighbor_cluster' and the tuple has the form ('neighbor_cluster',u_score,r_score,u_penalty). 
-			Both u_score and r_score are non_negative numbers (not at the same time) value for the prevelance of being closer or farther away from an urban location.
-			Specifically, for each census block x, the neighbors of x are summed together based on the value of u_score and r_score. 
-			Then the total is penalized by a factor of u_penalty (positive number) if x is going to land on an urban census block. 
-			Finally, all scores are normalized so that their sum is 1. 
-			- If `city_placement` is a string equal to 'random', then the probability distribution is a uniform probability distribution.
-			- If `city_placement` is a string equal to 'grid_gaussian_kde', then the probability distribution is formed using gaussian_kde from the scipy package.
-			Kernel density estimation is a way to estimate the probability density function (PDF) of a random variable in a non-parametric way. 
-			gaussian_kde works for both uni-variate and multi-variate data. It includes automatic bandwidth determination.
-			For our implementation of the gaussian_kde, the kernel is formed by giving the function of all the grid locations that are urban (>50% census blocks that are urban means the grid location is urban).
-			In this way, the probability of landing on an urban census block is higher than that of landing on a rural census block. 
-			Additionally, the probability distribution starts at a uniform value equal to the mean of the probabilities for urban and rural census blocks, and then the probability distribution is added to this, so as to increase the probability of choosing a random grid location that is rural. 
-			- If `city_placement` is a string equal to 'grid_gaussian_kde', then a similar procedure as when `city_placement` was equal to 'grid_gaussian_kde' will take place to determine the probability distribution.
-			The main difference is that the kernel function is constructed using the actual locations of all the census blocks in all grid locations. 
-			This gives a more representative kernel distribution function, however, it will take longer to build the kernel. 
-		- The 'mute_factor' will mute the effects of adding the mean of the probabilities to each of the countryside locations when creating the probability distribution function that will randomly determine where the next grid location will be placed. The 'mute_factor' is a positive float or integer.
-		The higher the mute_factor, the less that adding the mean to all of the probabilities will impact the pdf. 
-		That is, the pdf will mostly resemble what was found by the kernel density estimation when mute_factor>1000 since the mean of the all probabilities found by the kernel density estimation is being divided by mute_factor.
-		A mute_factor of 1 means that we simply add the mean of the probabilities found by the kernel densisty estimation to all grid locations. 
-		A mute_factor less than 1 but greater than 0 will make the mean of the probabilities found by the kernel density estimation have a larger influence on the final pdf. A mute_factor close to 0 will make it like a uniform distribution. 
-		- Similar to the 'mute_factor', the 'silence_factor' will turn off and on the ability to add the mean of the kernel density estimation to the pdf found by the kernel density estimation. 
-		The 'silence_factor' is a non-negative float or integer.
-		A 'silence_factor' of 1 means that the mean of the kernel density estimation will be added to the pdf found by the kernel density estimation. 
-		A 'silence_factor' of 0 means that the mean of the kernel density estimation will not be added to the pdf found by the kernel density estimation. 
-		- The 'rand_city_locs' variable is a boolean variable for determining how the individual grid locations (not the cities) will be placed. 
-		If `rand_city_locs==True`, then the urban census blocks are randomly placed around the state. However, if `rand_city_locs==False`, then the urban census blocks are placed close to where they were in the original state. This only works when the variable use_cities is set to False.
-		- The 'min_u_cbs' variable is a non-negative integer. 
-		While placing the individual grid locations (not the cities), 'min_u_cbs' represents the minimum allowed number of urban census blocks in a grid location when trying to detect how many census blocks are in a grid location.
-	- Suppose that `use_specs==(False,False,True)`. 
-	Then `use_parameters` is a tuple of length 4 where the elements of the tuple represent the variables 'ratio', 'iterations', 'nbr_dist','no_isolates', and 'metric'. See the section below on the Schelling Segregation Algorithm for a description of these variables.
-- `city_specs`: This argument is a tuple that will help determine the number of cities using various methods. 
-The possible values for the first coordinate are 0, 1, 2, and 3. The lengths of the tuple depends on the first coordinate. If the first coordinate is 0, 1, 2, or 3, then the length of the tuple is 2, 3, 2, 2 respectively. 
-  -If the first coordinate is 0, then the number of samples used to build a city is the value in the second coordinate of the `city_specs` tuple. 
-  -If the first coordinate is 1 and the tuple is (1,x,y), then x is a string that represents the 2-digit code for one of the possible states listed above in `state`, and y is an integer greater than or equal to 1000. The number of cities when the first coordinate is 1 is the number of cities in state x with a population over y people.
-  -If the first coordinate is 2 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. 
-The number of cities when the first coordinate is 2 is equal to the number of cities over a population of 5000 in state x. 
-  -If the first coordinate is 3 and the tuple is (1,x), then x is a string that represents the 2-digit code for one of the possible states listed above in `states`. The number of cities when the first coordinate is 2 is equal to the number of cities over a population of 5000 in state x. The sizes of the cities will be the same sizes as those that appear in state x. 
-- `noisy_parameters`: A binary tuple of length 3. The three elements indicate for which data will noise be added.
-If the first coordinate is 1, the total population will have random Gaussian noise added. If the second coordinate is 1, the variables in `demo_cols` will have random noise added. If the third coordinate is 1, the vote totals will have random noise added.
-WARNING: Currently, there is no vote total column, so anything but 0 will likely produce an error, or it should produce an error if it does not. 
-- `demo_cols`: A list of strings where each string represents the demographic columns that will have Gaussian random noise applied to each census block in each of the samples. 
-The options for elements in the list are the following: 
-'NH_WHITE',
-'NH_BLACK',
-'NH_2MORE',
-'NH_AMIN',
-'NH_ASIAN',
-'NH_NHPI',
-'NH_OTHER',
-'HISP',
-'H_2MORE',
-'H_AMIN',
-'H_ASIAN',
-'H_BLACK',
-'H_NHPI',
-'H_OTHER',
-'H_WHITE',
-'VAP',
-'WVAP',
-'BVAP',
-'HVAP',
-'AMINVAP',
-'ASIANVAP',
-'NHPIVAP',
-'2MOREVAP', and
-'OTHERVAP'.
-- `support_parameters`: a tuple of length 9 whose elements represent the variables 'mod', 'mod_prob', 'mono_rural_ur', 'mono_city_ur', 'pop_cat', 'maxiter', 'min_city_pop', 'mimic_city', and 'interval_prob'. 
-	- 'mod' is a string that represents the modification that is to be made on each sample.
-	This modification would be to the edges between census blocks in the sample or the vertices (census blocks) themselves. 
-	The options for modification are as follows: 'add_vert', 'add_edges', 'add_remove_edges', 'delete_vert', 'delete_edges', and 'none'.
-	WARNING: It is possible that all of these modification may make the graph non-planar. 
-	The purpose of modifying the graph is to create random samples that are similar to the original sample graphically, but not exactly the same. 
-		- 'add_vert': Adds a vertex to a random face uniformly at random and adds a random number of edges based on 'mod_prob' probability. The sample must be planar for this to work. Currently, this method is suppressed since it is not clear how to generate data out of nowhere for the new census block.
-		- 'add_edges': Add a random number of edges between vertices based on the 'mod_prob' probability while retaining planarity. The sample must be planar in order for any edges to be added. 
-		- 'add_remove_edges': Add and remove a random number of edges based on the 'mod_prob' probability while retaining planarity. The sample must be planar in order for any edges to be added. 
-		- 'delete_vert': A random probability of vertices are deleted based on the 'mod_prob' probability. It is possible the sample becomes disconnected.
-		- 'delete_edges': A random probability of edges are deleted based on the 'mod_prob' probability. It is possible the sample becomes disconnected.
-		- 'none': No modification is made. 
-	- 'mod_prob' is a float between 0 and 1 that represents the probability of a change occurring based on the modification selected in 'mod'.
-	- 'mono_rural_ur' is a binary variable that is either 0 or 1. This variable determines whether urban census blocks are allowed to be included when building the countryside. 
-	If 'mono_rural_ur' equals 1, then only rural census blocks are allowed in the construction of the countryside. Otherwise, urban census blocks are allowed to be included. 
-	- 'mono_city_ur': A binary variable that is either 0 or 1. This variable determines whether rural census blocks are allowed to be included when building the countryside. 
-	If 'mono_city_ur' equals 1, then only urban census blocks are allowed in the construction of the city samples. Otherwise, rural census blocks are allowed to be included. 
-	- 'pop_cat': integer or string. The only string accepted is 'all'. The intergers allowed are from 0 to the length of the population division. The population is currently divided into cities with 
-	less than 50,000 people (0), 
-	between 50,000 and 60,000 people (1),
-	between 60,000 and 70,000 people (2),
-	between 70,000 and 80,000 people (3), 
-	between 80,000 and 90,000 people (4), 
-	between 90,000 and 100,000 people (5),
-	between 100,000 and 200,000 people (6),
-	between 200,000 and 300,000 people (7),
-	between 300,000 and 400,000 people (8),
-	between 400,000 and 500,000 people (9),
-	between 500,000 and 600,000 people (10),
-	between 600,000 and 700,000 people (11),
-	between 700,000 and 800,000 people (12),
-	between 800,000 and 900,000 people (13),
-	between 900,000, and 1,000,000 people (14),
-	between 1 and 2 million people (15),
-	between 2 and 3 million people (16), 
-	between 3 and 4 million people (17), 
-	between 4 and 5 million people (18), 
-	between 5 and 6 million people (19), 
-	between 6 and 7 million people (20), 
-	between 7 and 8 million people (21), 
-	and over 8 million people  (22). 
-	The population between 50K and 60K are labeled as 0 in 'pop_cat' and increases incrementally as the population increases. 
-	Another option is to set the variable to 'all' which indicates that all city sizes are possible in the creation of new cities. 
-	- 'maxiter' is the maximum number of iterations allowed in any process throughout the program. 
-	- 'min_city_pop' is the minimum city population when deciding on how to determine which cities the program will use when building the cities. This variable is only relevant if the 1st element of `city_specs` is 2 or 3. 
-	- 'mimic_city' is a boolean variable that determines if some of the parameters will mimic characteristics of the original state. One parameter that will be overwritten if `mimic_city==True` is the minimum number of census blocks per grid location. 
-	In this case, the minimum number of census blocks per grid location is equal to (sum of total population)/((samples_per_state)(average state population per census block)).
-	The other parameter that is changed is the 'grid_placement' variable. When `mimic_city==True`, the number of grid locations is based on (sum of total population)/((samples_per_state)(average state population per census block)). 
-	- 'interval_prob' is a probability associated to edges when the `merge_method=='interval'`. This probability is the mean used to determine the probability of whether an edge should be kept. That is, a Gaussian random number is chosen to the this probability, say p, by using the value 'interval_prob' as the mean and 0.1 as the standard deviation. This is set to 0.8 by default. The probability p is taken and multiplied by the number of edges joining two samples and the floor of this product is the number of edges that will be used to join two samples. Uniformly at random, edges are chosen to be joined between the two samples. 
-- `save_status`: A binary tuple of length 2. If the first coordinate is 1, a png will be save of the final graph after cities have been merged into the graph. In the png image, the red vertices represent the rural census blocks while the blue vertices represent the cities. 
-If the second coordinate is 1, a json file of the graph with the data will be saved into a folder called OUTPUT. 
-
-
+	If `water==True`, then all census blocks that contain only water (no land) will be deleted from the possible set of census blocks that can be chosen during the construction of the state.	
+- `use_parameters`: This argument is a tuple of length 6.
+	- `use_parameters` is a tuple of length 6 where the elements of the tuple represent the variables 'ratio', 'iterations', 'nbr_dist','no isolates', 'metric', and 'number of urban grid locations'. See the section below on the Schelling Segregation Algorithm for a description of these variables.
 
 An example of a fully filled out command to run in the terminal would be the following:
 ```
