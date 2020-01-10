@@ -180,7 +180,6 @@ The purpose of the 3rd element in the tuple will change depending on whether the
 An example of a fully filled out command to run in the terminal would be the following:
 ```
 run rsg_ver1.py '44' (1000,False) (0.5,30,1,True,'cityblock',None)
-
 run rsg_ver1.py '13' (11758,False) (0.30,40,2,False,'cityblock',1309)
 ```
 <!--Here is a description of each variable in the above command:
