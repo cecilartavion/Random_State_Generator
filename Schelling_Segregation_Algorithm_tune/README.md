@@ -18,3 +18,9 @@ If the similarity ratio is greater than ratio, then the specified grid location 
 - `no_isolates`: this is a True/False variable. 
 If it is True, then all isolated (in the graph theoretical sense) grid locations that are designated as urban (with over 50% urban census blocks) will be removed from the urban_cb list which is the list of grid locations.
 - `fixed_urban_gl`: this variable is the number of urban census blocks that are randomly generated on the countryside. 
+
+To run the code, simply use the following code with all of the files in this folder placed in one directory and set as the working directory:
+```
+run ssa_test.py st ratio iterations nbr_dist no_isolates metric fixed_urban_gl
+run ssa_test.py '44' 0.14 40 3 False 'cityblock' 120
+```
