@@ -80,8 +80,8 @@ The output of the code will be a dual graph where each vertex is a census block,
 
 ## How To Run Code
 
-To run the code, change the working directory to the file that contains "rsg_ver1.py". Additionally, change the string for `shp_path` to your directory that contains all of the original shapefiles that can be downloaded from the Census Bureau. 
-The folder structure in the folder associated with the original shapefiles must be as indicated by the definition of `BK` in the rsg_ver1.py code. 
+To run the code, change the working directory to the file that contains `rsg_ver1.py`. Additionally, change the string for `shp_path` to your directory that contains all of the original shapefiles that can be downloaded from the Census Bureau. 
+The folder structure in the folder associated with the original shapefiles must be as indicated by the definition of `BK` in the `rsg_ver1.py` code. 
 Also, change the string for `json_cb_path` to point towards your directory that contains all the json shapefiles that were provided by Daryl DeFord at [daryldeford.com/dual_graphs]. 
 
 Credit for constructing the json files goes entirely toward Daryl DeFord. 
@@ -173,60 +173,85 @@ The purpose of the 3rd element in the tuple will change depending on whether the
 	- The 2nd element in `state_parameters` represents the variable 'water' which is a boolean variable. 
 	If `water==True`, then all census blocks that contain only water (no land) will be deleted from the possible set of census blocks that can be chosen during the construction of the state.	
 - `use_parameters`: This argument is a tuple of length 6.
-	- `use_parameters` is a tuple of length 6 where the elements of the tuple represent the variables 'ratio', 'iterations', 'nbr_dist','no isolates', 'metric', and 'number of urban grid locations'. See the section below on the Schelling Segregation Algorithm for a description of these variables.
+	- `use_parameters` is a tuple of length 6 where the elements of the tuple represent the variables `ratio`, `iterations`, `nbr_dist`,`no_isolates`, `metric`, and `fixed_urban_gl`. See the section below on the Schelling Segregation Algorithm for a description of these variables.
 
 ## Example
 
 An example of a fully filled out command to run in the terminal would be the following:
 ```
 run rsg_ver1.py '44' (1000,False) (0.5,30,1,True,'cityblock',None)
+
 run rsg_ver1.py '13' (11758,False) (0.30,40,2,False,'cityblock',1309)
+run rsg_ver1.py '13' (11758,False) (0.30,40,2,False,'cityblock',1309)
+run rsg_ver1.py '13' (11758,True) (0.30,40,2,False,'cityblock',1309) 
+run rsg_ver1.py '13' (11758,False) (0.415,30,2,True,'cityblock',2200) 
+run rsg_ver1.py '13' (11758,True) (0.415,30,2,True,'cityblock',2200) 
+run rsg_ver1.py '17' (18199,False) (0.23,30,3,False,'cityblock',1913)
+run rsg_ver1.py '17' (18199,True) (0.23,30,3,False,'cityblock',1913)
+run rsg_ver1.py '17' (18199,False) (0.3,30,3,True,'cityblock',2800)
+run rsg_ver1.py '17' (18199,True) (0.3,30,3,True,'cityblock',2800) 
+run rsg_ver1.py '20' (9834,False) (0.25,50,1,False,'chebyshev',347) 
+run rsg_ver1.py '20' (9834,True) (0.25,50,1,False,'chebyshev',347) 
+
+run rsg_ver1.py '20' (9834,False) (0.22,30,2,True,'chebyshev',760) 
+run rsg_ver1.py '20' (9834,True) (0.22,30,2,True,'chebyshev',760) 
+run rsg_ver1.py '22' (8405,False) (0.22,30,1,False,'chebyshev',643) 
+run rsg_ver1.py '22' (8405,True) (0.22,30,1,False,'chebyshev',643) 
+run rsg_ver1.py '22' (8405,False) (0.25,30,1,True,'chebyshev',700) 
+run rsg_ver1.py '22' (8405,True) (0.25,30,1,True,'chebyshev',700) 
+run rsg_ver1.py '25' (6355,False) (0.3,10,2,False,'chebyshev',2678) 
+run rsg_ver1.py '25' (6355,True) (0.3,10,2,False,'chebyshev',2678) 
+run rsg_ver1.py '25' (6355,False) (0.45,10,1,True,'cityblock',2830) 
+run rsg_ver1.py '25' (6355,True) (0.45,10,1,True,'cityblock',2830) 
+
+run rsg_ver1.py '27' (10617,False) (0.16,40,2,False,'cityblock',431) 
+run rsg_ver1.py '27' (10617,True) (0.16,40,2,False,'cityblock',431) 
+run rsg_ver1.py '27' (10617,False) (0.22,30,2,True,'cityblock',830) 
+run rsg_ver1.py '27' (10617,True) (0.22,30,2,True,'cityblock',830) 
+run rsg_ver1.py '39' (14874,False) (0.25,15,2,False,'cityblock',2253) 
+run rsg_ver1.py '39' (14874,True) (0.25,15,2,False,'cityblock',2253) 
+run rsg_ver1.py '39' (14874,False) (0.45,30,1,True,'cityblock',3200) 
+run rsg_ver1.py '39' (14874,True) (0.45,30,1,True,'cityblock',3200) 
+run rsg_ver1.py '42' (16927,False) (0.25,30,2,False,'cityblock',2694) 
+run rsg_ver1.py '42' (16927,True) (0.25,30,2,False,'cityblock',2694) 
+
+run rsg_ver1.py '42' (16927,False) (0.42,20,1,True,'chebyshev',3700) 
+run rsg_ver1.py '42' (16927,True) (0.42,20,1,True,'chebyshev',3700) 
+run rsg_ver1.py '49' (4763,False) (0.14,100,2,False,'chebyshev',146) 
+run rsg_ver1.py '49' (4763,True) (0.14,100,2,False,'chebyshev',146) 
+run rsg_ver1.py '49' (4763,False) (0.16,30,2,True,'chebyshev',220) 
+run rsg_ver1.py '49' (4763,True) (0.16,30,2,True,'chebyshev',220) 
+run rsg_ver1.py '53' (7886,False) (0.22,60,2,False,'chebyshev',555) 
+run rsg_ver1.py '53' (7886,True) (0.22,60,2,False,'chebyshev',555) 
+run rsg_ver1.py '53' (7886,False) (0.23,23,2,True,'chebyshev',800)
+run rsg_ver1.py '53' (7886,True) (0.23,23,2,True,'chebyshev',800) 
 ```
-<!--Here is a description of each variable in the above command:
-- `grid_placement` is set to 'mixed' which means that it is a mixture of the 'random' `grid_placement` method and 'fixed' `grid_placement` method when constructing the countryside (mostly rural census blocks). 
-The '3' and '4' represent the length and width of the rectangle built using the 'fixed' method that will be constructed using samples of size `sample_num` respectively. The '5' represents the number of additional samples of census blocks added iteratively to the boundary of the rectangle using the 'random' method.
-- `sampling_method` is set to 'diam' for diameter.
-- `merge_method` is set to 'intervals'.
-- `sample_num` is set to 50. That is, the number of census blocks chosen in each sample is approximately 50.
-- `state` is set to '44' which is Rhode Island.
-- `pop_category` is set to 'all'. This means that all possible population sizes are allowed when choosing census blocks to build the cities.
-- `city_specs` is set to (0,5). That is, the code will build 5 cities.
-- `mod` is set to none. That is, no modification will be made to the edges/vertices in each sample.
-- `mod_prob` is set to 0.5. That is, there is a probability of 0.5 that a modification will take place for the edges/vertices according to the `mod` chosen. 
-- `demo_cols` is set to ('BVAP','HVAP','WVAP','VAP'). That is, the only demographic columns that will be randomly modified (if at all) are Black, non-hispanic, voting age population in 2010 Census (BVAP), Hispanic voting age population in 2010 Census (HVA) White, non-hispanic, voting age population in 2010 Census (WVAP), and voting age population in 2010 Census (VAP). 
-- `sampling_parameters` is set to (1,1,0). That is, the total population and the demographics will have noise added to the data in each census block randomly. 
-- `save_status` is set to (1,1). That is, an image of the final graph will be saved as well as the json file of the graph with its corresponding data. 
-- `interval_prob` is set to 0.8. That is, a Gaussian random number is chosen with mean 0.8 and standard deviation 0.1 to determine the proportion of edges that are kept between two samples. 
-- `mono_rural_ur` is set to 1. That is, when building the countryside, samples that start with a rural census block must only be built using rural census blocks. 
-- `mono_city_ur` is set to 0. That is, when building the citites, rural census blocks are allowed to contain rural census blocks. 
-- `mean_samples_per_state` is set to 1000. That is, the average number of samples that will be used to build the countryside is 1000. 
-- `city_placement` is set to 'random'. That is, each city will be randomly inserted into the countryside. 
--->
+
 # Schelling Segregation Algorithm
 
 The Schelling Segregation Algorithm (SSA) is an agent-based model created by Thomas Schelling, an American economist, in 1971. 
 As the name suggest, the goal was to construct a model that would resemble the movement of agent of different races on some surface. 
-Specifically, an agent will move to a random open location if they are not surrounded by at least 'ratio' agents similar to themselves. The 'ratio' is called the similarity threshold and the proportion of similar agents that are in the neighborhood of an agent is called the similarity ratio. 
-In the context of segregation, a person will move from their location to an open location randomly if they are not surrounded by at least 'ratio' people. 
+Specifically, an agent will move to a random open location if they are not surrounded by at least `ratio` agents similar to themselves. The `ratio` is called the similarity threshold and the proportion of similar agents that are in the neighborhood of an agent is called the similarity ratio. 
+In the context of segregation, a person will move from their location to an open location randomly if they are not surrounded by at least `ratio` people. 
 Unfortunately, SSA does not accurately model segregation since the model fails to account for economic difficulties, gentrification, and other external and internal forces.
 
 Despite these limitations, we have created a modification of the SSA similar to that proposed by Cottrell his unpublished [manuscript](http://www-personal.umich.edu/~dcott/pdfs/Chapter_1.pdf). Note that Cottrell was redistributing the vote whereas we are redistributing the urban vs. rural locations. 
 The neighborhood of a particular grid location is based on 'nbr_dist' using the distance metric specified by 'metric. 
 Two of the most successful metrics in practice for our geometry have been Chebyshev metric (also know as L-infinity metric) and the city block metric (also known as the Manhatten metric). The possible metrics can be found on the [scipy documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html). The possible metrics are as follows: 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'wminkowski', 'yule'.
-The number of iterations by which the SSA is run is controlled by the variable 'iterations'. 
-Sometimes, if 'iterations' is not large enough or 'ratio' is not tuned properly, there are many isolated grid locations that primarily have urban census blocks. To resolve this, the program has the ability to delete these locations by setting `no_isolates==True`. 
-The last variable that can be chanced is the 'fixed_urban_gl", that is, the variable that can fix the number of grid locations that primarily have urban census blocks. 
+The number of iterations by which the SSA is run is controlled by the variable `iterations`. 
+Sometimes, if `iterations` is not large enough or `ratio` is not tuned properly, there are many isolated grid locations that primarily have urban census blocks. To resolve this, the program has the ability to delete these locations by setting `no_isolates==True`. 
+The last variable that can be chanced is the `fixed_urban_gl`, that is, the variable that can fix the number of grid locations that primarily have urban census blocks. 
 
 To clarify all of the variables, the `use_parameter` argument takes six elements when `use_ssa=True`. In this case, we have the following variables in order:
-- The first element of `use_parameters` is 'ratio'. This variable is a number between 0 and 1, and determines the proportion of neighbors that need to be simiar to a particular urban grid location in order for the grid location not to change.
-- The second element of `use_parameters` is 'iterations'. This integer variable is the number of iterations the Schelling Segregation Algorithm will perform before stopping. 
-- The third element of `use_parameters` is 'nbr_dist'. This float variable is the positive number that indicates any vertex as being a neighbor if the distance between a designated vertex and another vertex is less than 'nbr_dist'. 
-- The fourth element of `use_parameters` is 'no_isolates'. This boolean varaible indicates whether isolated grid locations are deleted. That is, if `no_isolates==True`, then all urban grid locations that are not adjacent to another urban grid location are deleted from the list of urban grid locations.
-- The fifth element of `use_parameters` is 'metric'. This string variable represents how distance is calculated between two verices. 
-- The sixth element of `use_parameters` is 'fixed_urban_gl'. This string or integer variable represents the number of urban grid locations that will be used in the Schelling Segregation Algorithm. If `fixed_urban_gl==None`, then the number of urban grid locations is based on the number of urban grid locations in the original state, but also depends on the value of 'sampling_method' and 'state_shape'. 
-If 'fixed_urban_gl' is a positive integer, then 'fixed_urban_gl' is the number of urban grid locations used in the Schelling Segregation Algorithm. 
-It is particularly useful to set the value for 'fixed_urban_gl' when `no_isolates==True` since otherwise the number of urban grid locations is not necessarily going to be the number of urban grid locations intended. 
+- The first element of `use_parameters` is `ratio`. This variable is a number between 0 and 1, and determines the proportion of neighbors that need to be simiar to a particular urban grid location in order for the grid location not to change.
+- The second element of `use_parameters` is `iterations`. This integer variable is the number of iterations the Schelling Segregation Algorithm will perform before stopping. 
+- The third element of `use_parameters` is `nbr_dist`. This float variable is the positive number that indicates any vertex as being a neighbor if the distance between a designated vertex and another vertex is less than `nbr_dist`. 
+- The fourth element of `use_parameters` is `no_isolates`. This boolean varaible indicates whether isolated grid locations are deleted. That is, if `no_isolates==True`, then all urban grid locations that are not adjacent to another urban grid location are deleted from the list of urban grid locations.
+- The fifth element of `use_parameters` is `metric`. This string variable represents how distance is calculated between two verices. 
+- The sixth element of `use_parameters` is `fixed_urban_gl`. This string or integer variable represents the number of urban grid locations that will be used in the Schelling Segregation Algorithm. If `fixed_urban_gl==None`, then the number of urban grid locations is based on the number of urban grid locations in the original state, but also depends on the value of `sampling_method` and `state_shape`. 
+If `fixed_urban_gl` is a positive integer, then `fixed_urban_gl` is the number of urban grid locations used in the Schelling Segregation Algorithm. 
+It is particularly useful to set the value for `fixed_urban_gl` when `no_isolates==True` since otherwise the number of urban grid locations is not necessarily going to be the number of urban grid locations intended. 
 
 
 # Images 
-The files in images are examples of instances run by text_main.py. The description of each is recorded based on the same variables and order as listed above. 
+The files in images are examples of instances run by `rsg_ver1.py`. The description of each is recorded based on the same variables and order as listed above. 
